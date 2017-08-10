@@ -506,6 +506,12 @@ wv.map.ui = wv.map.ui || function(models, config, components) {
     trailing: true
   });
 
+  var setRotateBtn = _.throttle(function() {
+    rotation.updateRotationButton();
+  }, 600, {
+    trailing: true
+  });
+
   /*
    * Updates the extents of OpenLayers map
    *
@@ -724,7 +730,8 @@ wv.map.ui = wv.map.ui || function(models, config, components) {
     onZoomChange();
   };
   var onRotate = function() {
-    rotation.updateRotation();
+    rotation.updateRotation(); //update and save rotation value
+    setRotateBtn(); // Once updated, get the last value and set btn label
     updateExtent();
   };
   /*

@@ -145,6 +145,10 @@ wv.map.rotate = wv.map.rotate || function(ui, models, map) {
    *                            The current view is then set to this new value.
    */
   this.saveRotation = function(currentDeg, currentView) {
+    if (currentDeg < 0) {
+      var newNadVal = ((360 + currentDeg) * (Math.PI / 180));
+      currentView.setRotation(newNadVal);
+    }
     if (Math.abs(currentDeg) === 360) {
       currentView.setRotation(0);
     } else if (Math.abs(currentDeg) >= 360) {
@@ -158,7 +162,7 @@ wv.map.rotate = wv.map.rotate || function(ui, models, map) {
   };
 
   /*
-   * Called as event listener when map is rotated. Update url to reflect rotation reset
+   * Called as event listener when map is rotated. Update url to reflect new rotation.
    *
    * @method updateRotation
    * @static
@@ -166,18 +170,27 @@ wv.map.rotate = wv.map.rotate || function(ui, models, map) {
    * @returns {void}
    */
   this.updateRotation = function() {
-    var deg,
-      radians,
-      currentView,
-      currentDeg;
+    var currentView = ui.selected.getView();
+    var radians = currentView.getRotation();
+    models.map.rotation = radians;
 
-    currentView = ui.selected.getView();
-    radians = currentView.getRotation();
+    var currentDeg = (currentView.getRotation() * (180.0 / Math.PI));
+    this.saveRotation(currentDeg, currentView);
+  };
+
+  /*
+   * Called as event listener when map is rotated. Update the rotation button label with current degree value.
+   *
+   * @method updateRotationButton
+   * @static
+   *
+   * @returns {void}
+   */
+  this.updateRotationButton = function() {
+    var currentView = ui.selected.getView();
+    var radians = currentView.getRotation();
     models.map.rotation = radians;
     self.setResetButton(radians);
-
-    currentDeg = (currentView.getRotation() * (180.0 / Math.PI));
-    this.saveRotation(currentDeg, currentView);
   };
 
   /*
@@ -236,6 +249,7 @@ wv.map.rotate = wv.map.rotate || function(ui, models, map) {
     var currentDeg = (map.getView()
       .getRotation() * (180.0 / Math.PI));
 
+    var currentView = ui.selected.getView();
     this.saveRotation(currentDeg, currentView);
 
     map.getView()
