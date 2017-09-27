@@ -550,7 +550,6 @@ wv.map.ui = wv.map.ui || function(models, config, components) {
     mobileRotation = new ol.interaction.PinchRotate({
       duration: animationDuration
     });
-    console.log(ol.proj.get(proj.crs));
     map = new ol.Map({
       view: new ol.View({
         maxResolution: proj.resolutions[0],
