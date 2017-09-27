@@ -215,6 +215,7 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
       extent: extent,
       source: new ol.source.WMTS(sourceOptions)
     });
+
     return layer;
   };
 
@@ -237,7 +238,6 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
     source = config.sources[def.source];
     extent = proj.maxExtent;
     start = [proj.maxExtent[0], proj.maxExtent[3]];
-    console.log(proj.maxExtent);
     if (!source) {
       throw new Error(def.id + ": Invalid source: " + def.source);
     }
@@ -275,15 +275,19 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
     });
     var layerName = def.layer || def.id;
     var tms = def.matrixSet;
-    var source = new ol.source.VectorTile({
+    var sourceOptions = {
       format: new ol.format.MVT(),
       tileGrid: ol.tilegrid.createXYZ({
         maxZoom: parseInt(tms.match(/^GoogleMapsCompatible_Level(\d)/)[1]) - 1
       }),
       tilePixelRatio: 16,
-      url: `http://localhost:8080/onearth/wmts/epsg3857/wmts.cgi?layer=${layerName}&tilematrixset=${tms}&Service=WMTS&Request=GetTile&Version=1.0.0&Format=application%2Fx-protobuf&TileMatrix={z}&TileCol={x}&TileRow={y}`
+      url: source.url + `?layer=${layerName}&tilematrixset=${tms}&Service=WMTS&Request=GetTile&Version=1.0.0&Format=application%2Fx-protobuf&TileMatrix={z}&TileCol={x}&TileRow={y}`,
+    };
+    var layer = new ol.layer.VectorTile({
+      extent: extent,
+      source: new ol.source.VectorTile(sourceOptions),
+      style: vectorLayerStyle
     });
-    var layer = new ol.layer.VectorTile({extent: extent, source: source, style: vectorLayerStyle});
 
     return layer;
   };
