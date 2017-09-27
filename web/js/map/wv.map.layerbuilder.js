@@ -59,6 +59,21 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
           });
         }
 
+      } else if (def.type === "vector") {
+        layer = createLayerVector(def, options);
+        if (proj.id === 'geographic' && def.wrapadjacentdays === true) {
+          layerNext = createLayerVector(def, options, 1);
+          layerPrior = createLayerVector(def, options, -1);
+
+          layer.wv = attributes;
+          layerPrior.wv = attributes;
+          layerNext.wv = attributes;
+
+          layer = new ol.layer.Group({
+            layers: [layer, layerNext, layerPrior]
+          });
+        }
+
       } else if (def.type === "wms") {
         layer = createLayerWMS(def, options);
         if (proj.id === 'geographic' && def.wrapadjacentdays === true) {
@@ -190,6 +205,64 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
       extent: extent,
       source: new ol.source.WMTS(sourceOptions)
     });
+    return layer;
+  };
+
+  /*
+   * Create a new Vector Layer
+   *
+   * @method createLayerVector
+   * @static
+   *
+   * @param {object} def - Layer Specs
+   *
+   * @param {object} options - Layer options
+   *
+   *
+   * @returns {object} OpenLayers Vector layer
+   */
+  var createLayerVector = function(def, options, day) {
+    var proj, source, matrixSet, matrixIds;
+    proj = models.proj.selected;
+    source = config.sources[def.source];
+
+    if (!source) {
+      throw new Error(def.id + ": Invalid source: " + def.source);
+    }
+    matrixSet = source.matrixSets[def.matrixSet];
+    if (!matrixSet) {
+      throw new Error(def.id + ": Undefined matrix set: " + def.matrixSet);
+    }
+    if ("undefined" === typeof def.matrixIds) {
+      matrixIds = [];
+      _.each(matrixSet.resolutions, function(resolution, index) {
+        matrixIds.push(index);
+      });
+    } else {
+      matrixIds = def.matrixIds;
+    }
+
+    var vectorLayerStyle = new ol.style.Style({
+      fill: new ol.style.Fill({color: 'blue'}),
+      stroke: new ol.style.Stroke({color: 'blue', width: 1}),
+      image: new ol.style.Circle({
+        radius: 1,
+        fill: new ol.style.Fill({color: 'blue'}),
+        stroke: new ol.style.Stroke({color: 'blue', width: 1})
+      })
+    });
+    var layerName = def.layer || def.id;
+    var tms = def.matrixSet;
+    var source = new ol.source.VectorTile({
+      format: new ol.format.MVT(),
+      tileGrid: ol.tilegrid.createXYZ({
+        maxZoom: parseInt(tms.match(/^GoogleMapsCompatible_Level(\d)/)[1]) - 1
+      }),
+      tilePixelRatio: 16,
+      url: `http://localhost:8080/onearth/wmts/epsg3857/wmts.cgi?layer=${layerName}&tilematrixset=${tms}&Service=WMTS&Request=GetTile&Version=1.0.0&Format=application%2Fx-protobuf&TileMatrix={z}&TileCol={x}&TileRow={y}`
+    });
+    var layer = new ol.layer.VectorTile({source: source, style: vectorLayerStyle});
+
     return layer;
   };
 
