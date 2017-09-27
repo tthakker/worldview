@@ -222,10 +222,12 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
    * @returns {object} OpenLayers Vector layer
    */
   var createLayerVector = function(def, options, day) {
-    var proj, source, matrixSet, matrixIds;
+    var proj, extent, source, matrixSet, matrixIds;
     proj = models.proj.selected;
     source = config.sources[def.source];
-
+    extent = proj.maxExtent;
+    start = [proj.maxExtent[0], proj.maxExtent[3]];
+    console.log(proj.maxExtent);
     if (!source) {
       throw new Error(def.id + ": Invalid source: " + def.source);
     }
@@ -242,13 +244,23 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
       matrixIds = def.matrixIds;
     }
 
+    if (day) {
+      if (day === 1) {
+        extent = [-250, -90, -180, 90];
+        start = [-540, 90];
+      } else {
+        extent = [180, -90, 250, 90];
+        start = [180, 90];
+      }
+    }
+
     var vectorLayerStyle = new ol.style.Style({
-      fill: new ol.style.Fill({color: 'blue'}),
-      stroke: new ol.style.Stroke({color: 'blue', width: 1}),
+      fill: new ol.style.Fill({color: 'red'}),
+      stroke: new ol.style.Stroke({color: 'red', width: 1}),
       image: new ol.style.Circle({
         radius: 1,
-        fill: new ol.style.Fill({color: 'blue'}),
-        stroke: new ol.style.Stroke({color: 'blue', width: 1})
+        fill: new ol.style.Fill({color: 'red'}),
+        stroke: new ol.style.Stroke({color: 'red', width: 1})
       })
     });
     var layerName = def.layer || def.id;
@@ -261,7 +273,7 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
       tilePixelRatio: 16,
       url: `http://localhost:8080/onearth/wmts/epsg3857/wmts.cgi?layer=${layerName}&tilematrixset=${tms}&Service=WMTS&Request=GetTile&Version=1.0.0&Format=application%2Fx-protobuf&TileMatrix={z}&TileCol={x}&TileRow={y}`
     });
-    var layer = new ol.layer.VectorTile({source: source, style: vectorLayerStyle});
+    var layer = new ol.layer.VectorTile({extent: extent, source: source, style: vectorLayerStyle});
 
     return layer;
   };
