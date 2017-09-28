@@ -42,26 +42,29 @@ wv.layers.options = wv.layers.options || function(config, models, layer) {
       .attr("id", "wv-layers-options-dialog")
       .attr("data-layer", layer.id);
     renderOpacity($dialog);
-
     if (config.features.customPalettes) {
-      if (models.palettes.allowed(layer.id) &&
-        (models.palettes.getLegends(layer.id)
-          .length < 2)) {
-        //TODO: Dual Colormap options
-        /*if ( models.palettes.getLegends(layer.id).length > 1 ) {
-          renderLegendButtons($dialog);
-          }*/
-        var legend = models.palettes.getLegend(layer.id, index);
-        if ((legend.type === "continuous") ||
-          (legend.type === "discrete")) {
-          renderRange($dialog);
-          if (config.layers[layer.id].type !== "wms") {
-            renderPaletteSelector($dialog);
-          }
-        } else if (models.palettes.getDefaultLegend(layer.id, index)
-          .colors.length === 1) {
-          if (config.layers[layer.id].type !== "wms") {
-            renderPaletteSelector($dialog);
+      if (config.layers[layer.id].type === "vector") {
+        renderPaletteSelector($dialog);
+      } else {
+        if (models.palettes.allowed(layer.id) &&
+          (models.palettes.getLegends(layer.id)
+            .length < 2)) {
+          //TODO: Dual Colormap options
+          /*if ( models.palettes.getLegends(layer.id).length > 1 ) {
+            renderLegendButtons($dialog);
+            }*/
+          var legend = models.palettes.getLegend(layer.id, index);
+          if ((legend.type === "continuous") ||
+            (legend.type === "discrete")) {
+            renderRange($dialog);
+            if (config.layers[layer.id].type !== "wms") {
+              renderPaletteSelector($dialog);
+            }
+          } else if (models.palettes.getDefaultLegend(layer.id, index)
+            .colors.length === 1) {
+            if (config.layers[layer.id].type !== "wms") {
+              renderPaletteSelector($dialog);
+            }
           }
         }
       }
@@ -194,7 +197,7 @@ wv.layers.options = wv.layers.options || function(config, models, layer) {
         index = _.parseInt($(this)
           .val());
         rerenderRange();
-        rerenderPaletteSelector();
+        renderRasterPaletteSelector();
       });
   };
 
@@ -322,10 +325,88 @@ wv.layers.options = wv.layers.options || function(config, models, layer) {
       .attr("id", "wv-palette-selector");
     $dialog.append($header)
       .append($pane);
-    rerenderPaletteSelector(true);
+    if (config.layers[layer.id].type === "vector") {
+      renderVectorPaletteSelector(true);
+    } else {
+      renderRasterPaletteSelector(true);
+    }
   };
 
-  var rerenderPaletteSelector = function(firstTime) {
+  var renderVectorPaletteSelector = function(firstTime) {
+    var $pane = $("#wv-palette-selector")
+      .empty();
+    // $pane.append(defaultLegend());
+    // TODO: Move this into an vector palette options object.
+    var colorOptions =
+    {
+      "Blue": {
+        name: "Blue",
+        hex:  "#0000FF"
+      },
+      "Red": {
+        name: "Red",
+        hex:  "#FF0000"
+      },
+      "Green": {
+        name: "Green",
+        hex:  "#00FF00"
+      }
+    };
+    _.each(colorOptions, function(color) {
+      var $row = $("<div></div>")
+        .addClass("wv-palette-selector-row");
+      var $radio = $("<input></input>")
+        .attr("type", "radio")
+        .attr("id", "wv-palette-radio-" + color.name)
+        .attr("name", "wv-palette-radio")
+        .attr("data-palette", color.name);
+      var $label = $("<label></label>")
+        .attr("for", "wv-palette-radio-" + color.name);
+      var $image = $("<span></span>")
+        .addClass("wv-palettes-class")
+        .css("background-color", color.hex)
+        .html("&nbsp;");
+      var $description = $("<span></span>")
+        .html(color.name)
+        .addClass("wv-palette-label");
+      $label.append($image);
+      $label.append($description);
+
+      $row.append($radio);
+      $row.append($label);
+
+      $pane.append($row);
+    });
+    $dialog.append($pane);
+    $pane.perfectScrollbar();
+
+    $(".wv-palette-selector-row input[data-palette='Blue']")
+      .iCheck("check");
+
+    $("#wv-palette-selector input")
+      .on("ifChecked", function() {
+        var that = this;
+        setTimeout(function() {
+          var id = $(that)
+            .attr("data-palette");
+          if (id === "Blue") {
+            // TODO: Fix setting and getting palette color in the URL
+            // models.palettes.clearCustom(layer.id, index);
+          } else {
+            // models.palettes.setCustom(layer.id, id, index);
+          }
+        }, 0);
+      });
+
+    if (!firstTime) {
+      $("#wv-palette-selector")
+        .iCheck({
+          radioClass: 'iradio_square-grey'
+        });
+    }
+  };
+
+  var renderRasterPaletteSelector = function(firstTime) {
     var $pane = $("#wv-palette-selector")
       .empty();
     $pane.append(defaultLegend());

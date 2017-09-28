@@ -70,7 +70,8 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
         }
 
       } else if (def.type === "vector") {
-        layer = createLayerVector(def, options);
+        // TODO: Pass color variable into createLayerVector
+        layer = createLayerVector(def, options, null, '#FF33EE');
         if (proj.id === 'geographic' && def.wrapadjacentdays === true) {
           layerNext = createLayerVector(def, options, 1);
           layerPrior = createLayerVector(def, options, -1);
@@ -232,7 +233,7 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
    *
    * @returns {object} OpenLayers Vector layer
    */
-  var createLayerVector = function(def, options, day) {
+  var createLayerVector = function(def, options, day, color) {
     var proj, extent, source, matrixSet, matrixIds;
     proj = models.proj.selected;
     source = config.sources[def.source];
@@ -265,12 +266,12 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
     }
 
     var vectorLayerStyle = new ol.style.Style({
-      fill: new ol.style.Fill({color: 'red'}),
-      stroke: new ol.style.Stroke({color: 'red', width: 1}),
+      fill: new ol.style.Fill({color: color}),
+      stroke: new ol.style.Stroke({color: color, width: 1}),
       image: new ol.style.Circle({
         radius: 1,
-        fill: new ol.style.Fill({color: 'red'}),
-        stroke: new ol.style.Stroke({color: 'red', width: 1})
+        fill: new ol.style.Fill({color: color}),
+        stroke: new ol.style.Stroke({color: color, width: 1})
       })
     });
     var layerName = def.layer || def.id;
