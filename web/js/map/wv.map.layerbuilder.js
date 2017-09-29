@@ -70,8 +70,13 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
         }
 
       } else if (def.type === "vector") {
-        // TODO: Pass color variable into createLayerVector
-        layer = createLayerVector(def, options, null, '#FF33EE');
+        if(models.palettes.active[def.id]) {
+          var palette = models.palettes.active[def.id].maps;
+          var color = '#' + models.palettes.getCustom(palette[0].custom).colors[0].slice(0, -2);
+        } else {
+          var color = '#' + config.palettes.rendered[def.id].maps[0].legend.colors[0].slice(0, -2);
+        }
+        layer = createLayerVector(def, options, null, color);
         if (proj.id === 'geographic' && def.wrapadjacentdays === true) {
           layerNext = createLayerVector(def, options, 1);
           layerPrior = createLayerVector(def, options, -1);
