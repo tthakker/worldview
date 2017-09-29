@@ -272,7 +272,7 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
         maxZoom: parseInt(tms.match(/^GoogleMapsCompatible_Level(\d)/)[1]) - 1
       }),
       tilePixelRatio: 16,
-      url: source.url + `?layer=${layerName}&tilematrixset=${tms}&Service=WMTS&Request=GetTile&Version=1.0.0&Format=application%2Fx-protobuf&TileMatrix={z}&TileCol={x}&TileRow={y}`,
+      url: source.url + '?layer=' + layerName + '&tilematrixset=' + tms + '&Service=WMTS&Request=GetTile&Version=1.0.0&Format=application%2Fx-protobuf&TileMatrix={z}&TileCol={x}&TileRow={y}',
     };
     var layer = new ol.layer.VectorTile({
       extent: extent,
