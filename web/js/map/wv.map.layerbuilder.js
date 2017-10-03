@@ -18,6 +18,7 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
   var self = {};
   var map;
   self.init = function(Parent) {
+    console.log(config);
     self.extentLayers = [];
     Parent.events.on('selecting', hideWrap);
     Parent.events.on('selectiondone', showWrap);
@@ -70,11 +71,18 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
         }
 
       } else if (def.type === "vector") {
+        // If a custom palette is chosen, then set color.
         if(models.palettes.active[def.id]) {
           var palette = models.palettes.active[def.id].maps;
           var color = '#' + models.palettes.getCustom(palette[0].custom).colors[0].slice(0, -2);
-        } else {
+        }
+        // TODO: add build step to add the default color to the layer config and pull in here
+        // If you use a rendered layer's default color, set the default color.
+        else if(config.palettes.rendered[def.id]) {
           var color = '#' + config.palettes.rendered[def.id].maps[0].legend.colors[0].slice(0, -2);
+        } else {
+          // Set default color when layer is initially loaded. This should go away.
+          var color = '#000';
         }
         layer = createLayerVector(def, options, null, color);
         if (proj.id === 'geographic' && def.wrapadjacentdays === true) {
