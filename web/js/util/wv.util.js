@@ -567,6 +567,21 @@ wv.util = (function(self) {
     }
     return hex(r) + hex(g) + hex(b) + 'ff';
   };
+
+  self.trim = function(str) {
+    return str.replace(/^\s+|\s+$/gm,'');
+  };
+
+  self.rgbaToShortHex = function(rgba) {
+    var parts = rgba.substring(rgba.indexOf("(")).split(","),
+      r = parseInt(self.trim(parts[0].substring(1)), 10),
+      g = parseInt(self.trim(parts[1]), 10),
+      b = parseInt(self.trim(parts[2]), 10),
+      a = parseFloat(self.trim(parts[3].substring(0, parts[3].length - 1))).toFixed(2);
+
+    return ('#' + r.toString(16) + g.toString(16) + b.toString(16) + (a * 255).toString(16).substring(0,2));
+  };
+
   self.hexColorDelta = function(hex1, hex2) {
     var r1 = parseInt(hex1.substring(0, 2), 16);
     var g1 = parseInt(hex1.substring(2, 4), 16);
@@ -576,6 +591,127 @@ wv.util = (function(self) {
     var b2 = parseInt(hex2.substring(4, 6), 16);
     // calculate differences in 3D Space
     return Math.sqrt(Math.pow((r1 - r2), 2) + Math.pow((g1 - g2), 2) + Math.pow((b1 - b2), 2));
+  };
+
+  // Changes the RGB/HEX temporarily to a HSL-Value, modifies that value
+  // and changes it back to RGB/HEX.
+  self.changeHue = function(rgb, degree) {
+    var hsl = self.rgbToHSL(rgb);
+    hsl.h += degree;
+    if (hsl.h > 360) {
+      hsl.h -= 360;
+    }
+    else if (hsl.h < 0) {
+      hsl.h += 360;
+    }
+    return self.hslToRGB(hsl);
+  };
+
+  // exepcts a string and returns an object
+  self.rgbToHSL = function(rgb) {
+    // strip the leading # if it's there
+    rgb = rgb.replace(/^\s*#|\s*$/g, '');
+
+    // convert 3 char codes --> 6, e.g. `E0F` --> `EE00FF`
+    if(rgb.length == 3){
+      rgb = rgb.replace(/(.)/g, '$1$1');
+    }
+
+    var r = parseInt(rgb.substr(0, 2), 16) / 255,
+      g = parseInt(rgb.substr(2, 2), 16) / 255,
+      b = parseInt(rgb.substr(4, 2), 16) / 255,
+      cMax = Math.max(r, g, b),
+      cMin = Math.min(r, g, b),
+      delta = cMax - cMin,
+      l = (cMax + cMin) / 2,
+      h = 0,
+      s = 0;
+
+    if (delta == 0) {
+      h = 0;
+    }
+    else if (cMax == r) {
+      h = 60 * (((g - b) / delta) % 6);
+    }
+    else if (cMax == g) {
+      h = 60 * (((b - r) / delta) + 2);
+    }
+    else {
+      h = 60 * (((r - g) / delta) + 4);
+    }
+
+    if (delta == 0) {
+      s = 0;
+    }
+    else {
+      s = (delta/(1-Math.abs(2*l - 1)));
+    }
+
+    return {
+      h: h,
+      s: s,
+      l: l
+    };
+  };
+
+  // expects an object and returns a string
+  self.hslToRGB = function(hsl) {
+    var h = hsl.h,
+      s = hsl.s,
+      l = hsl.l,
+      c = (1 - Math.abs(2*l - 1)) * s,
+      x = c * ( 1 - Math.abs((h / 60 ) % 2 - 1 )),
+      m = l - c/ 2,
+      r, g, b;
+
+    if (h < 60) {
+      r = c;
+      g = x;
+      b = 0;
+    }
+    else if (h < 120) {
+      r = x;
+      g = c;
+      b = 0;
+    }
+    else if (h < 180) {
+      r = 0;
+      g = c;
+      b = x;
+    }
+    else if (h < 240) {
+      r = 0;
+      g = x;
+      b = c;
+    }
+    else if (h < 300) {
+      r = x;
+      g = 0;
+      b = c;
+    }
+    else {
+      r = c;
+      g = 0;
+      b = x;
+    }
+
+    r = self.normalize_rgb_value(r, m);
+    g = self.normalize_rgb_value(g, m);
+    b = self.normalize_rgb_value(b, m);
+
+    return self.rgbToHex(r,g,b);
+  };
+
+  self.normalize_rgb_value =function(color, m) {
+    color = Math.floor((color + m) * 255);
+    if (color < 0) {
+      color = 0;
+    }
+    return color;
+  };
+
+  self.rgbToHex = function(r, g, b) {
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   };
   /**
    * Submits an AJAX request or retreives the result from the cache.

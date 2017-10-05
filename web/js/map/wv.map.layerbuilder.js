@@ -18,7 +18,6 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
   var self = {};
   var map;
   self.init = function(Parent) {
-    console.log(config);
     self.extentLayers = [];
     Parent.events.on('selecting', hideWrap);
     Parent.events.on('selectiondone', showWrap);
@@ -74,15 +73,17 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
         // If a custom palette is chosen, then set color.
         if(models.palettes.active[def.id]) {
           var palette = models.palettes.active[def.id].maps;
-          var color = '#' + models.palettes.getCustom(palette[0].custom).colors[0].slice(0, -2);
+          var hexColor = models.palettes.getCustom(palette[0].custom).colors[0];
+          var color = wv.util.hexToRGBA(hexColor);
         }
         // TODO: add build step to add the default color to the layer config and pull in here
         // If you use a rendered layer's default color, set the default color.
         else if(config.palettes.rendered[def.id]) {
-          var color = '#' + config.palettes.rendered[def.id].maps[0].legend.colors[0].slice(0, -2);
+          var hexColor = config.palettes.rendered[def.id].maps[0].legend.colors[0];
+          var color = wv.util.hexToRGBA(hexColor);
         } else {
           // Set default color when layer is initially loaded. This should go away.
-          var color = '#000';
+          var color = 'rgba(0,0,0,1)';
         }
         layer = createLayerVector(def, options, null, color);
         if (proj.id === 'geographic' && def.wrapadjacentdays === true) {
@@ -278,13 +279,10 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
       }
     }
 
-    var vectorLayerStyle = new ol.style.Style({
-      fill: new ol.style.Fill({color: color}),
-      stroke: new ol.style.Stroke({color: color, width: 1}),
+    var vectorLayerDefaultStyle = new ol.style.Style({
       image: new ol.style.Circle({
-        radius: 1,
+        radius: 5,
         fill: new ol.style.Fill({color: color}),
-        stroke: new ol.style.Stroke({color: color, width: 1})
       })
     });
     var layerName = def.layer || def.id;
@@ -300,9 +298,49 @@ wv.map.layerbuilder = wv.map.layerbuilder || function(models, config, cache, Par
     var layer = new ol.layer.VectorTile({
       extent: extent,
       source: new ol.source.VectorTile(sourceOptions),
-      style: vectorLayerStyle
+      style: vectorLayerDefaultStyle
     });
 
+    var setColorFromAttribute = true;
+    if (setColorFromAttribute) {
+      var newColor = wv.util.rgbaToShortHex(color);
+      layer.setStyle(function(feature, resolution) {
+        var confidence = feature.get('CONFIDENCE');
+        var dir = feature.get('dir');
+        if(confidence) {
+          var renderColor = wv.util.changeHue(newColor, confidence);
+          return [
+            new ol.style.Style({
+              image: new ol.style.Circle({
+                radius: 5,
+                fill: new ol.style.Fill({color: renderColor}),
+              }),
+            })
+          ];
+        } else if(dir) {
+          var radian = dir * Math.PI / 180;
+          return [
+            new ol.style.Style({
+              image: new ol.style.Icon({
+                src: 'images/up_arrow12white.png',
+                imgSize: [12,12],
+                rotation: radian,
+              })
+            })
+          ];
+        } else {
+          var renderColor = color;
+          return [
+            new ol.style.Style({
+              image: new ol.style.Circle({
+                radius: 5,
+                fill: new ol.style.Fill({color: renderColor}),
+              }),
+            })
+          ];
+        }
+      });
+    }
     return layer;
   };
 
