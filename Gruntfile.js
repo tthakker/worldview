@@ -27,7 +27,8 @@ var nodeModuleFiles = [
   "node_modules/perfect-scrollbar/dist/js/*",
   "node_modules/perfect-scrollbar/dist/css/*",
   "node_modules/clipboard/dist/clipboard.js",
-  "node_modules/clipboard/dist/clipboard.min.js"
+  "node_modules/clipboard/dist/clipboard.min.js",
+  "node_modules/ol-mapbox-style/dist/olms.js"
 ];
 
 // Build date shown in the About box
