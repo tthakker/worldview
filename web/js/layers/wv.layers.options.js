@@ -312,14 +312,8 @@ wv.layers.options = wv.layers.options || function (config, models, layer) {
     renderColorPaletteSelector(true);
   };
 
-<<<<<<< HEAD
   var renderColorPaletteSelector = function(firstTime) {
-    var $pane = $("#wv-palette-selector")
-=======
-  var rerenderPaletteSelector = function (firstTime) {
-    var $pane = $('#wv-palette-selector')
->>>>>>> dba831626ad8e4e100060469cbe939e83b9ceaa7
-      .empty();
+    var $pane = $('#wv-palette-selector').empty();
     $pane.append(defaultLegend());
     var recommended = layer.palette.recommended || [];
     _.each(recommended, function (id) {

@@ -58,7 +58,6 @@ wv.map.layerbuilder = wv.map.layerbuilder || function (models, config, cache, Pa
             layers: [layer, layerNext, layerPrior]
           });
         }
-<<<<<<< HEAD
 
       } else if (def.type === "vector") {
         // If a custom palette is chosen, then set color.
@@ -91,9 +90,6 @@ wv.map.layerbuilder = wv.map.layerbuilder || function (models, config, cache, Pa
         }
 
       } else if (def.type === "wms") {
-=======
-      } else if (def.type === 'wms') {
->>>>>>> dba831626ad8e4e100060469cbe939e83b9ceaa7
         layer = createLayerWMS(def, options);
         if (proj.id === 'geographic' && def.wrapadjacentdays === true) {
           layerNext = createLayerWMS(def, options, 1);

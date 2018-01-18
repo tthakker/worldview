@@ -566,7 +566,6 @@ wv.util = (function (self) {
     }
     return hex(r) + hex(g) + hex(b) + 'ff';
   };
-<<<<<<< HEAD
 
   self.trim = function(str) {
     return str.replace(/^\s+|\s+$/gm,'');
@@ -583,9 +582,6 @@ wv.util = (function (self) {
   };
 
   self.hexColorDelta = function(hex1, hex2) {
-=======
-  self.hexColorDelta = function (hex1, hex2) {
->>>>>>> dba831626ad8e4e100060469cbe939e83b9ceaa7
     var r1 = parseInt(hex1.substring(0, 2), 16);
     var g1 = parseInt(hex1.substring(2, 4), 16);
     var b1 = parseInt(hex1.substring(4, 6), 16);
