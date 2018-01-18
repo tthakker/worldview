@@ -13,7 +13,8 @@ If you have any questions or ideas, or notice any problems or bugs, first [searc
 If you want to submit your own contributions, follow these steps;
 
 * Fork the Worldview repo
-* Create a new branch from the branch you'd like to contribute to
+* Create a new branch off of the branch you'd like to contribute to
+* ** Note: ** If there is not a feature branch already created for you to branch off of, you will want to branch off of `development` to create your own feature branch. We only branch directly off of `master` to resolve urgent bugs.
 * If an issue does't already exist, submit one (see above)
 * [Create a pull request](https://help.github.com/articles/creating-a-pull-request/) from your fork into the target branch of the nasa-gibs/worldview repo
 * Be sure to [mention the corresponding issue number](https://help.github.com/articles/closing-issues-using-keywords/) in the PR description, i.e. "Fixes [#480](https://github.com/nasa-gibs/worldview/issues/480)"
@@ -24,9 +25,39 @@ If you want to submit your own contributions, follow these steps;
 
 We ask that you follow these guidelines with your contributions;
 
-### Tests
+### Unit Tests
 
-All of the automated tests for this project need to pass before your submission will be accepted. You can run `npm test` in the command line after making changes to verify that the tests pass. If you add new functionality, please consider adding tests for that functionality as well.
+All of the unit tests for this project need to pass before your submission will be accepted. You can run `npm test` in the command line after making changes to verify that the tests pass. If you add new functionality, please consider adding tests for that functionality as well.
+
+### End-to-end Tests
+
+You can run the included end-to-end tests to test the app in Chrome and Firefox. The tests run the Cucumber features in the `./e2e/features` using Nightwatch and Selenium.
+
+To run tests in Chrome;
+
+1) Run `npm run e2e:chrome`
+
+To run tests in Firefox;
+
+1) [Create a new Firefox profile](https://developer.mozilla.org/en-US/Firefox/Multiple_profiles) called 'nightwatch'
+2) Run `npm run e2e:firefox`
+
+You can run tests for both browsers in sequence by running `npm run e2e`,
+
+To run tests in Browserstack;
+
+1) Log into your [Browserstack automation](https://www.browserstack.com/automate) and get your username and access key from the upper left
+2) Set these environmental variables in your shell;
+ - `export BROWSERSTACK_ACCESS_KEY=yourkeyhere`
+ - `export BROWSERSTACK_USER=yourusernamehere`
+3) Configure `./e2e/environments.json` with the browsers you want to test.
+4) Run `npm run browserstack`
+
+#### End-to-end Test Reports
+
+After running end-to-end tests, reports are generated and saved in `./e2e/reports`. You can convert these to HTML by running `npm run report <environment>` where `<environment>` is either the lowercase name of the browser for local tests (`chrome` or `firefox`) or the name of the Browserstack environment, such as `Chrome_61-0_OS_X_El_Capitan-1` (you can get this name from the JSON files in `./e2e/reports`).
+
+The end-to-end tests are a little bit flaky, so they aren't required to pass before a submission will be accepted, but you should run them and read through the results to make sure that you haven't broken any functionality. Please also consider adding end-to-end tests to cover any functionality you add.
 
 ### Commits
 
