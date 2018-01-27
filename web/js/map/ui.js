@@ -853,7 +853,7 @@ export function mapui(models, config) {
         return;
       }
       pixels = map.getEventPixel(e.originalEvent);
-      coords = map.getCoordinateFromPixel(pixels);
+      coords = map.getCoordinateFromPixel(pixels) || [0, 0];
       if (!olExtent.containsCoordinate(extent, coords)) {
         outside = true;
       }
