@@ -9,7 +9,7 @@ export function animationUi(models, ui) {
   var dateModel = models.date;
   var animModel = models.anim;
   var queueLength;
-  var zooms = ['year', 'month', 'day', 'hour', 'minute'];
+  var zooms = ['year', 'month', 'day', 'minute'];
   var queue = new Queue(5, Infinity);
   var preload = {};
   var preloadArray;
