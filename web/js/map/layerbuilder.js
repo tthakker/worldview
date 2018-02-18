@@ -197,21 +197,12 @@ export function mapLayerBuilder(models, config, cache, Parent) {
       }
     }
 
-    if (['daily', 'monthly', 'yearly'].includes(def.period)) {
-      date = options.date || models.date.selected;
-      // date = util.prevDateInDateRange(date, dateArray);
-      //
-      // // Is current "rounded" previous date not in array of availableDates
-      // if (date && !dateArray.includes(date)) {
-      //   // Then, update layer object with new array of dates
-      //   def.availableDates = util.datesinDateRanges(def, date, true);
-      //   date = util.prevDateInDateRange(date, dateArray);
-      // }
-      if (day) {
-        date = util.dateAdd(date, 'day', day);
-      }
-      extra = '?TIME=' + date.toISOString().split('.')[0] + 'Z';
+    date = options.date || models.date.selected;
+    if (day) {
+      date = util.dateAdd(date, 'day', day);
     }
+    extra = '?TIME=' + date.toISOString().split('.')[0] + 'Z';
+
     var sourceOptions = {
       url: source.url + extra,
       layer: def.layer || def.id,
@@ -286,13 +277,12 @@ export function mapLayerBuilder(models, config, cache, Parent) {
 
     extra = '';
 
-    if (def.period === 'daily' || def.period === 'monthly' || def.period === 'yearly') {
-      date = options.date || models.date.selected;
-      if (day) {
-        date = util.dateAdd(date, 'day', day);
-      }
-      extra = '?TIME=' + util.toISOStringDate(date);
+    date = options.date || models.date.selected;
+    if (day) {
+      date = util.dateAdd(date, 'day', day);
     }
+    extra = '?TIME=' + date.toISOString().split('.')[0] + 'Z';
+
     var sourceOptions = {
       url: source.url + extra,
       wrapX: true,
