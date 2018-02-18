@@ -272,9 +272,9 @@ export default (function (self) {
    * @return {Date} the date object
    */
   self.clearTimeUTC = function (date) {
-    // date.setUTCHours(0);
-    // date.setUTCMinutes(0);
-    // date.setUTCSeconds(0);
+    date.setUTCHours(0);
+    date.setUTCMinutes(0);
+    date.setUTCSeconds(0);
     date.setUTCMilliseconds(0);
     return date;
   };
@@ -561,7 +561,7 @@ export default (function (self) {
 
   /**
    * Gets the current day. Use this instead of the Date methods to allow
-   * debugging alternate "now" times.
+   * debugging alternate "now" dates.
    *
    * @method today
    * @static
@@ -570,10 +570,6 @@ export default (function (self) {
    */
   self.today = function () {
     return self.clearTimeUTC(self.now());
-  };
-
-  self.thisTime = function () {
-    return self.now();
   };
 
   /**
