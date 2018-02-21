@@ -115,9 +115,9 @@ export function animationUi(models, ui) {
     startDate = util.parseDateUTC(state.startDate);
     currentDate = dateModel.selected;
     if (currentDate > startDate && self.nextDate(currentDate) < endDate) {
-      return util.toISOStringDate(self.nextDate(currentDate));
+      return self.nextDate(currentDate).toISOString().split('.')[0] + 'Z';
     }
-    return util.toISOStringDate(startDate);
+    return startDate.toISOString().split('.')[0] + 'Z';
   };
 
   /*
@@ -201,7 +201,7 @@ export function animationUi(models, ui) {
    *
    */
   self.addToInQueue = function (date) {
-    var strDate = util.toISOStringDate(date);
+    var strDate = date.toISOString().split('.')[0] + 'Z';
     inQueue[strDate] = date;
     preloadArray.push(strDate);
   };
@@ -220,7 +220,7 @@ export function animationUi(models, ui) {
    *
    */
   self.addDateToCache = function (date) {
-    var strDate = util.toISOStringDate(date);
+    var strDate = date.toISOString().split('.')[0] + 'Z';
     preload[strDate] = date;
     delete inQueue[strDate];
   };
@@ -377,7 +377,7 @@ export function animationUi(models, ui) {
       nextDate = self.setNewDate(nextDate, startDate);
     }
 
-    nextDateStr = util.toISOStringDate(nextDate);
+    nextDateStr = nextDate.toISOString().split('.')[0] + 'Z';
 
     if (!preload[nextDateStr] && !inQueue[nextDateStr] && !self.state.playing) {
       self.clearCache();
@@ -413,11 +413,11 @@ export function animationUi(models, ui) {
     for (var i = 0; i < queueLength; i++) {
       self.addDate(day);
       day = self.getNextBufferDate(day, startDate, endDate);
-      if (util.toISOStringDate(day) === lastToQueue) {
+      if (day.toISOString().split('.')[0] + 'Z' === lastToQueue) {
         self.addDate(day);
         loader = uiIndicator.loading();
         return;
-      } else if (util.toISOStringDate(day) === util.toISOStringDate(currentDate)) {
+      } else if (day.toISOString().split('.')[0] + 'Z' === currentDate.toISOString().split('.')[0] + 'Z') {
         queueLength = i;
         loader = uiIndicator.loading();
         return;
@@ -468,7 +468,7 @@ export function animationUi(models, ui) {
    */
   self.addItemToQueue = function (currentDate, startDate, endDate) {
     var nextDate = self.getNextBufferDate(currentDate, startDate, endDate);
-    var nextDateStr = util.toISOStringDate(nextDate);
+    var nextDateStr = nextDate.toISOString().split('.')[0] + 'Z';
 
     if (!inQueue[nextDateStr] &&
       !preload[nextDateStr] &&
@@ -524,7 +524,7 @@ export function animationUi(models, ui) {
     while (i < queueLength) {
       if (self.nextDate(day) > endDate) {
         if (!loop) {
-          return util.toISOStringDate(day);
+          return day.toISOString().split('.')[0] + 'Z';
         }
         day = self.setNewDate(day, startDate);
       } else {
@@ -532,7 +532,7 @@ export function animationUi(models, ui) {
       }
       i++;
     }
-    return util.toISOStringDate(day);
+    return day.toISOString().split('.')[0] + 'Z';
   };
 
   /*
@@ -551,7 +551,7 @@ export function animationUi(models, ui) {
   self.checkShouldLoop = function (playIndexJSDate) {
     if (animModel.rangeState.loop) {
       self.shiftCache();
-      self.state.playIndex = util.toISOStringDate(self.setNewDate(playIndexJSDate, new Date(animModel.rangeState.startDate)));
+      self.state.playIndex = self.setNewDate(playIndexJSDate, new Date(animModel.rangeState.startDate)).toISOString().split('.')[0] + 'Z';
       setTimeout(function () {
         self.checkShouldPlay();
         self.checkQueue(queueLength, self.state.playIndex);
@@ -657,7 +657,7 @@ export function animationUi(models, ui) {
       dateModel.select(util.parseDateUTC(playIndex));
       pastDates[playIndex] = util.parseDateUTC(playIndex); // played record
       self.state.playIndex = playIndex;
-      playIndex = util.toISOStringDate(self.nextDate(new Date(playIndex)));
+      playIndex = self.nextDate(new Date(playIndex)).toISOString().split('.')[0] + 'Z';
       playIndexJSDate = new Date(playIndex);
       if (playIndexJSDate > endDate) {
         clearInterval(interval);
