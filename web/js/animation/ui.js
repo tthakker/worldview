@@ -160,7 +160,11 @@ export function animationUi(models, ui) {
    *
    */
   self.nextDate = function (date) {
-    return util.dateAdd(date, self.getInterval(), 1);
+    if (models.date.selectedZoom === 4) {
+      return util.dateAdd(date, self.getInterval(), 10);
+    } else {
+      return util.dateAdd(date, self.getInterval(), 1);
+    }
   };
 
   /*
