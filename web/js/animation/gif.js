@@ -267,10 +267,12 @@ export function animationGif(models, config, ui) {
       renderable: true
     });
     lodashEach(products, function (layer) {
+      let layerDate = new Date(date);
+      layerDate = new Date(layerDate.getTime() + (layerDate.getTimezoneOffset() * 60000));
       if (layer.endDate) {
-        if (date > new Date(layer.endDate)) return;
+        if (layerDate > new Date(layer.endDate)) return;
       }
-      if (layer.visible && new Date(layer.startDate) < date) {
+      if (layer.visible && new Date(layer.startDate) <= layerDate) {
         layers.push(layer);
       } else if (!layer.startDate) {
         layers.push(layer);
