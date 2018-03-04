@@ -271,8 +271,6 @@ export function imagePanel(models, ui, config) {
         opacities.push((lodashIsUndefined(product.opacity)) ? 1 : product.opacity);
       });
 
-      // console.log("EPSG: " + epsg);
-
       var px = pixels;
       var x1 = px.x;
       var y1 = px.y;
