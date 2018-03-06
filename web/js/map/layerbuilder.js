@@ -134,7 +134,9 @@ export function mapLayerBuilder(models, config, cache, Parent) {
 
     if (options.date) {
       date = options.date;
-      if (def.period === 'monthly' && models.date.selectedZoom <= 2) {
+      if (def.period === 'daily' && models.date.selectedZoom <= 3) {
+        date = self.closestDate(def, options);
+      } else if (def.period === 'monthly' && models.date.selectedZoom <= 2) {
         date = self.closestDate(def, options);
       } else if (def.period === 'yearly' && models.date.selectedZoom <= 1) {
         date = self.closestDate(def, options);
