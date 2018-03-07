@@ -624,6 +624,7 @@ export function timelineConfig(models, config, ui) {
 
         // Value for clicked normal tick
         tl.zoom.current.ticks.normal.clickDate = function (d) {
+          d = new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
           return util.offsetUTC(new Date(d.getUTCFullYear(),
             d.getUTCMonth(),
             d.getUTCDate(),
@@ -633,6 +634,7 @@ export function timelineConfig(models, config, ui) {
 
         // Value for boundary ribbon hover label
         tl.zoom.current.ticks.boundary.hover = function (d) {
+          d = new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
           return util.offsetUTC(new Date(d.getUTCFullYear(),
             d.getUTCMonth(),
             d.getUTCDate(),
@@ -652,6 +654,7 @@ export function timelineConfig(models, config, ui) {
 
         // Value for clicked boundary tick
         tl.zoom.current.ticks.boundary.clickDate = function (d) {
+          d = new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
           return util.offsetUTC(new Date(d.getUTCFullYear(),
             d.getUTCMonth(),
             d.getUTCDate(),
