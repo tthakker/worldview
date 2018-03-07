@@ -8,14 +8,14 @@ export function timelineData(models, config, ui) {
   var self = {};
 
   self.start = function () {
-    return new Date(config.startDate);
+    return util.offsetUTC(new Date(config.startDate));
   };
 
   self.end = function () {
-    return new Date(
-      new Date(util.today())
+    return util.offsetUTC(new Date(
+      util.offsetUTC(new Date(util.today()))
         .setUTCDate(util.today()
-          .getUTCDate()));
+          .getUTCDate())));
   };
 
   self.set = function () {
@@ -53,17 +53,17 @@ export function timelineData(models, config, ui) {
         var layerId = this.id;
 
         if (this.startDate) {
-          layerStart = new Date(this.startDate);
+          layerStart = util.offsetUTC(new Date(this.startDate));
           staticLayer = false;
         } else {
           layerStart = self.start();
         }
         if (this.inactive === true) {
-          layerEnd = new Date(this.endDate);
+          layerEnd = util.offsetUTC(new Date(this.endDate));
         } else {
-          layerEnd = new Date(self.end()
+          layerEnd = util.offsetUTC(new Date(self.end()
             .setUTCDate(self.end()
-              .getUTCDate() + 1));
+              .getUTCDate() + 1)));
         }
 
         var currentDB = tl.dataBars.append('svg:rect')

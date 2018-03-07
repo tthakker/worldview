@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import util from '../util/util';
 import d3 from 'd3';
 /**
  * Implements the timeline pick
@@ -33,18 +34,18 @@ export function timelinePick(models, config, ui) {
         change.call(this);
         updateChanges(tempPickTipDate);
       } else if (nextChange > tl.data.end()) {
-        tipDate = new Date(Date.UTC(tl.data.end()
+        tipDate = util.offsetUTC(new Date(Date.UTC(tl.data.end()
           .getUTCFullYear(),
         model.selected.getUTCMonth(),
-        model.selected.getUTCDate()));
+        model.selected.getUTCDate())));
         self.offset = tl.x(tipDate) - width / 2;
         change.call(this);
         updateChanges(tempPickTipDate);
       } else if (nextChange < tl.data.start()) {
-        nextChange = new Date(Date.UTC(tl.data.start()
+        nextChange = util.offsetUTC(new Date(Date.UTC(tl.data.start()
           .getUTCFullYear(),
         model.selected.getUTCMonth(),
-        model.selected.getUTCDate()));
+        model.selected.getUTCDate())));
       }
     } else if (d3.event.dx < 0) {
       if (prevChange === undefined) {

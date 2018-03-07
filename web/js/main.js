@@ -104,7 +104,7 @@ window.onload = () => {
 
   var main = function() {
     if (parameters.elapsed) {
-      startTime = new Date()
+      startTime = util.offsetUTC(new Date())
         .getTime();
     } else {
       elapsed = function() {};
@@ -374,7 +374,7 @@ window.onload = () => {
 
   var elapsed = function(message) {
     if (!parameters.elapsed) return;
-    var t = new Date()
+    var t = util.offsetUTC(new Date())
       .getTime() - startTime;
     console.log(t, message);
   };

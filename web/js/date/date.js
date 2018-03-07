@@ -21,7 +21,7 @@ export function parse(state, errors) {
     try {
       state.now = util.parseDateUTC(state.now);
       util.now = function () {
-        return new Date(state.now.getTime());
+        return util.offsetUTC(new Date(state.now.getTime()));
       };
       util.warn('Overriding now: ' + state.now.toISOString());
     } catch (error) {

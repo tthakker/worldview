@@ -106,7 +106,7 @@ export function layersModel(models, config) {
       (config.parameters.debugGIBS || config.parameters.ignoreDateRange);
     if (ignoreRange) {
       return {
-        start: new Date(Date.UTC(1970, 0, 1)),
+        start: util.offsetUTC(new Date(Date.UTC(1970, 0, 1))),
         end: util.today()
       };
     }
@@ -146,8 +146,8 @@ export function layersModel(models, config) {
           .getTime();
       }
       return {
-        start: new Date(min),
-        end: new Date(max)
+        start: util.offsetUTC(new Date(min)),
+        end: util.offsetUTC(new Date(max))
       };
     }
   };

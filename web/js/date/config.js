@@ -61,16 +61,16 @@ export function timelineConfig(models, config, ui) {
         tickCountMax = Math.ceil(tl.width / tickWidth);
 
         paddedRange = [
-          new Date(tl.data.start().setUTCFullYear(tl.data.start().getUTCFullYear() - 10)),
-          new Date(tl.data.end().setUTCFullYear(tl.data.end().getUTCFullYear() + 10))
+          util.offsetUTC(new Date(tl.data.start().setUTCFullYear(tl.data.start().getUTCFullYear() - 10))),
+          util.offsetUTC(new Date(tl.data.end().setUTCFullYear(tl.data.end().getUTCFullYear() + 10)))
         ];
 
-        altEnd = new Date(tl.data.start()
+        altEnd = util.offsetUTC(new Date(tl.data.start()
           .getUTCFullYear() + tickCountMax,
         tl.data.start()
           .getUTCMonth(),
         tl.data.start()
-          .getUTCDate());
+          .getUTCDate()));
 
         tl.zoom.drawTicks(tickCount,
           tickCountMax,
@@ -99,63 +99,63 @@ export function timelineConfig(models, config, ui) {
 
         // Calculated next boundary tick by date
         tl.zoom.current.ticks.boundary.next = function (current) {
-          var next = new Date(current);
-          return new Date(next.setUTCFullYear(next.getUTCFullYear() + 10));
+          var next = util.offsetUTC(new Date(current));
+          return util.offsetUTC(new Date(next.setUTCFullYear(next.getUTCFullYear() + 10)));
         };
 
         // Calculated next normal tick by date
         tl.zoom.current.ticks.normal.next = function (current) {
-          var next = new Date(current);
-          return new Date(next.setUTCFullYear(next.getUTCFullYear() + 1));
+          var next = util.offsetUTC(new Date(current));
+          return util.offsetUTC(new Date(next.setUTCFullYear(next.getUTCFullYear() + 1)));
         };
 
         // Date of first printed boundary interval of this zoom level
         tl.zoom.current.ticks.boundary.first = function () {
           var first = tl.ticks.normal.firstDate;
-          return new Date(Date.UTC(Math.floor(first.getUTCFullYear() / 10) * 10,
+          return util.offsetUTC(new Date(Date.UTC(Math.floor(first.getUTCFullYear() / 10) * 10,
             0,
-            1));
+            1)));
         };
 
         // Date of first printed normal tick
         tl.zoom.current.ticks.normal.first = function () {
           var first = tl.ticks.firstDate;
-          return new Date(Date.UTC(first.getUTCFullYear() - 1,
+          return util.offsetUTC(new Date(Date.UTC(first.getUTCFullYear() - 1,
             first.getUTCMonth(),
-            first.getUTCDate()));
+            first.getUTCDate())));
         };
 
         // Date of last printed boundary interval of this zoom level
         tl.zoom.current.ticks.boundary.last = function () {
           var last = tl.ticks.normal.lastDate;
-          return new Date(Date.UTC(Math.ceil(last.getUTCFullYear() / 10) * 10,
+          return util.offsetUTC(new Date(Date.UTC(Math.ceil(last.getUTCFullYear() / 10) * 10,
             0,
-            1));
+            1)));
         };
 
         // Value for hovered normal label
         tl.zoom.current.ticks.normal.hover = function (d) {
           // No modifications to date obj at this zoom level
-          return new Date(d.getUTCFullYear(),
+          return util.offsetUTC(new Date(d.getUTCFullYear(),
             model.selected.getUTCMonth(),
-            model.selected.getUTCDate());
+            model.selected.getUTCDate()));
         };
 
         // Value for clicked normal tick
         tl.zoom.current.ticks.normal.clickDate = function (d) {
-          return new Date(d.getUTCFullYear(),
+          return util.offsetUTC(new Date(d.getUTCFullYear(),
             model.selected.getUTCMonth(),
-            model.selected.getUTCDate());
+            model.selected.getUTCDate()));
         };
 
         // Value for hovered boundary tick
         tl.zoom.current.ticks.boundary.hover = function (d) {
           var yearOffset = model.selected.getUTCFullYear() -
-            Math.ceil(new Date(model.selected.getUTCFullYear() / 10) * 10);
+            Math.ceil(util.offsetUTC(new Date(model.selected.getUTCFullYear() / 10)) * 10);
 
-          return new Date(d.getUTCFullYear() + yearOffset,
+          return util.offsetUTC(new Date(d.getUTCFullYear() + yearOffset,
             model.selected.getUTCMonth(),
-            model.selected.getUTCDate());
+            model.selected.getUTCDate()));
         };
 
         // Displayed default label
@@ -171,25 +171,25 @@ export function timelineConfig(models, config, ui) {
         // Value for clicked boundary tick, FIXME: This is exactly the same as hover value
         tl.zoom.current.ticks.boundary.clickDate = function (d) {
           var yearOffset = model.selected.getUTCFullYear() -
-            Math.ceil(new Date(model.selected.getUTCFullYear() / 10) * 10);
+            Math.ceil(util.offsetUTC(new Date(model.selected.getUTCFullYear() / 10)) * 10);
 
-          return new Date(d.getUTCFullYear() + yearOffset,
+          return util.offsetUTC(new Date(d.getUTCFullYear() + yearOffset,
             model.selected.getUTCMonth(),
-            model.selected.getUTCDate());
+            model.selected.getUTCDate()));
         };
 
         // When the date updates while dragging the pick forward
         tl.zoom.current.pick.nextChange = function (d) {
-          return new Date(Date.UTC(d.getUTCFullYear() + 1,
+          return util.offsetUTC(new Date(Date.UTC(d.getUTCFullYear() + 1,
             model.selected.getUTCMonth(),
-            model.selected.getUTCDate()));
+            model.selected.getUTCDate())));
         };
 
         // When the date updates while dragging the pick backward
         tl.zoom.current.pick.prevChange = function (d) {
-          return new Date(Date.UTC(d.getUTCFullYear(),
+          return util.offsetUTC(new Date(Date.UTC(d.getUTCFullYear(),
             model.selected.getUTCMonth(),
-            model.selected.getUTCDate()));
+            model.selected.getUTCDate())));
         };
 
         tl.zoom.current.pick.hoverTick = function (newDate) {
@@ -221,16 +221,16 @@ export function timelineConfig(models, config, ui) {
         tickCountMax = Math.ceil(tl.width / tickWidth);
 
         paddedRange = [
-          new Date(tl.data.start().setUTCFullYear(tl.data.start().getUTCFullYear() - 1)),
-          new Date(tl.data.end().setUTCFullYear(tl.data.end().getUTCFullYear() + 1))
+          util.offsetUTC(new Date(tl.data.start().setUTCFullYear(tl.data.start().getUTCFullYear() - 1))),
+          util.offsetUTC(new Date(tl.data.end().setUTCFullYear(tl.data.end().getUTCFullYear() + 1)))
         ];
 
-        altEnd = new Date(tl.data.start()
+        altEnd = util.offsetUTC(new Date(tl.data.start()
           .getUTCFullYear(),
         tl.data.start()
           .getUTCMonth() + tickCountMax,
         tl.data.start()
-          .getUTCDate());
+          .getUTCDate()));
 
         tl.zoom.drawTicks(tickCount,
           tickCountMax,
@@ -259,56 +259,56 @@ export function timelineConfig(models, config, ui) {
 
         // Calculated next boundary tick by date
         tl.zoom.current.ticks.boundary.next = function (current) {
-          var next = new Date(current);
-          return new Date(next.setUTCFullYear(next.getUTCFullYear() + 1));
+          var next = util.offsetUTC(new Date(current));
+          return util.offsetUTC(new Date(next.setUTCFullYear(next.getUTCFullYear() + 1)));
         };
 
         // Calculated next normal tick by date
         tl.zoom.current.ticks.normal.next = function (current) {
-          var next = new Date(current);
-          return new Date(next.setUTCMonth(next.getUTCMonth() + 1));
+          var next = util.offsetUTC(new Date(current));
+          return util.offsetUTC(new Date(next.setUTCMonth(next.getUTCMonth() + 1)));
         };
 
         // Date of first printed boundary interval of this zoom level
         tl.zoom.current.ticks.boundary.first = function () {
           var first = tl.ticks.normal.firstDate;
-          return new Date(Date.UTC(first.getUTCFullYear(),
+          return util.offsetUTC(new Date(Date.UTC(first.getUTCFullYear(),
             0,
-            1));
+            1)));
         };
 
         // Date of first printed normal tick
         tl.zoom.current.ticks.normal.first = function () {
           var first = tl.ticks.normal.firstDate;
-          return new Date(Date.UTC(first.getUTCFullYear(),
+          return util.offsetUTC(new Date(Date.UTC(first.getUTCFullYear(),
             first.getUTCMonth() - 1,
-            first.getUTCDate()));
+            first.getUTCDate())));
         };
 
         // Date of last printed boundary interval of this zoom level
         tl.zoom.current.ticks.boundary.last = function () {
           var last = tl.ticks.normal.lastDate;
-          return new Date(Date.UTC(last.getUTCFullYear() + 1,
+          return util.offsetUTC(new Date(Date.UTC(last.getUTCFullYear() + 1,
             0,
-            1));
+            1)));
         };
 
         // Value for hovered normal label
         tl.zoom.current.ticks.normal.hover = function (d) {
           // No modifications to date obj at this zoom level
-          return new Date(d.getUTCFullYear(), d.getUTCMonth(), model.selected.getUTCDate());
+          return util.offsetUTC(new Date(d.getUTCFullYear(), d.getUTCMonth(), model.selected.getUTCDate()));
         };
 
         // Value for clicked normal tick
         tl.zoom.current.ticks.normal.clickDate = function (d) {
-          return new Date(d.getUTCFullYear(), d.getUTCMonth(), model.selected.getUTCDate());
+          return util.offsetUTC(new Date(d.getUTCFullYear(), d.getUTCMonth(), model.selected.getUTCDate()));
         };
 
         // Value for hovered boundary tick
         tl.zoom.current.ticks.boundary.hover = function (d) {
-          return new Date(d.getUTCFullYear(),
+          return util.offsetUTC(new Date(d.getUTCFullYear(),
             model.selected.getUTCMonth(),
-            model.selected.getUTCDate());
+            model.selected.getUTCDate()));
         };
 
         // Displayed default label
@@ -323,23 +323,23 @@ export function timelineConfig(models, config, ui) {
 
         // Value for clicked boundary tick
         tl.zoom.current.ticks.boundary.clickDate = function (d) {
-          return new Date(d.getUTCFullYear(),
+          return util.offsetUTC(new Date(d.getUTCFullYear(),
             model.selected.getUTCMonth(),
-            model.selected.getUTCDate());
+            model.selected.getUTCDate()));
         };
 
         // When the date updates while dragging the pick forward
         tl.zoom.current.pick.nextChange = function (d) {
-          return new Date(Date.UTC(d.getUTCFullYear(),
+          return util.offsetUTC(new Date(Date.UTC(d.getUTCFullYear(),
             d.getUTCMonth() + 1,
-            model.selected.getUTCDate()));
+            model.selected.getUTCDate())));
         };
 
         // When the date updates while dragging the pick backward
         tl.zoom.current.pick.prevChange = function (d) {
-          return new Date(Date.UTC(d.getUTCFullYear(),
+          return util.offsetUTC(new Date(Date.UTC(d.getUTCFullYear(),
             d.getUTCMonth(),
-            model.selected.getUTCDate()));
+            model.selected.getUTCDate())));
         };
 
         tl.zoom.current.pick.hoverTick = function (newDate) {
@@ -363,16 +363,16 @@ export function timelineConfig(models, config, ui) {
         tickCountMax = Math.ceil(tl.width / tickWidth);
 
         paddedRange = [
-          new Date(tl.data.start().setUTCDate(tl.data.start().getUTCDate() - 15)),
-          new Date(tl.data.end().setUTCDate(tl.data.end().getUTCDate() + 15))
+          util.offsetUTC(new Date(tl.data.start().setUTCDate(tl.data.start().getUTCDate() - 15))),
+          util.offsetUTC(new Date(tl.data.end().setUTCDate(tl.data.end().getUTCDate() + 15)))
         ];
 
-        altEnd = new Date(tl.data.start()
+        altEnd = util.offsetUTC(new Date(tl.data.start()
           .getUTCFullYear(),
         tl.data.start()
           .getUTCMonth(),
         tl.data.start()
-          .getUTCDate() + tickCountMax);
+          .getUTCDate() + tickCountMax));
 
         tl.zoom.drawTicks(tickCount,
           tickCountMax,
@@ -401,38 +401,38 @@ export function timelineConfig(models, config, ui) {
 
         // Calculated next boundary tick by date
         tl.zoom.current.ticks.boundary.next = function (current) {
-          var next = new Date(current);
-          return new Date(next.setUTCMonth(next.getUTCMonth() + 1));
+          var next = util.offsetUTC(new Date(current));
+          return util.offsetUTC(new Date(next.setUTCMonth(next.getUTCMonth() + 1)));
         };
 
         // Calculated next normal tick by date
         tl.zoom.current.ticks.normal.next = function (current) {
-          var next = new Date(current);
-          return new Date(next.setUTCDate(next.getUTCDate() + 1));
+          var next = util.offsetUTC(new Date(current));
+          return util.offsetUTC(new Date(next.setUTCDate(next.getUTCDate() + 1)));
         };
 
         // Date of first printed boundary interval of this zoom level
         tl.zoom.current.ticks.boundary.first = function () {
           var first = tl.ticks.normal.firstDate;
-          return new Date(Date.UTC(first.getUTCFullYear(),
+          return util.offsetUTC(new Date(Date.UTC(first.getUTCFullYear(),
             first.getUTCMonth(),
-            1));
+            1)));
         };
 
         // Date of first printed normal tick
         tl.zoom.current.ticks.normal.first = function () {
           var first = tl.ticks.normal.firstDate;
-          return new Date(Date.UTC(first.getUTCFullYear(),
+          return util.offsetUTC(new Date(Date.UTC(first.getUTCFullYear(),
             first.getUTCMonth(),
-            first.getUTCDate() - 1));
+            first.getUTCDate() - 1)));
         };
 
         // Date of last printed boundary interval of this zoom level
         tl.zoom.current.ticks.boundary.last = function () {
           var last = tl.ticks.normal.lastDate;
-          return new Date(Date.UTC(last.getUTCFullYear(),
+          return util.offsetUTC(new Date(Date.UTC(last.getUTCFullYear(),
             last.getUTCMonth() + 1,
-            1));
+            1)));
         };
 
         // Value for hovered normal label
@@ -443,16 +443,16 @@ export function timelineConfig(models, config, ui) {
 
         // Value for clicked normal tick
         tl.zoom.current.ticks.normal.clickDate = function (d) {
-          return new Date(d.getUTCFullYear(),
+          return util.offsetUTC(new Date(d.getUTCFullYear(),
             d.getUTCMonth(),
-            d.getUTCDate());
+            d.getUTCDate()));
         };
 
         // Value for hovered boundary tick
         tl.zoom.current.ticks.boundary.hover = function (d) {
-          return new Date(d.getUTCFullYear(),
+          return util.offsetUTC(new Date(d.getUTCFullYear(),
             d.getUTCMonth(),
-            model.selected.getUTCDate());
+            model.selected.getUTCDate()));
         };
 
         // Displayed default label
@@ -467,23 +467,23 @@ export function timelineConfig(models, config, ui) {
 
         // Value for clicked boundary tick
         tl.zoom.current.ticks.boundary.clickDate = function (d) {
-          return new Date(d.getUTCFullYear(),
+          return util.offsetUTC(new Date(d.getUTCFullYear(),
             d.getUTCMonth(),
-            model.selected.getUTCDate());
+            model.selected.getUTCDate()));
         };
 
         // When the date updates while dragging the pick forward
         tl.zoom.current.pick.nextChange = function (d) {
-          return new Date(Date.UTC(d.getUTCFullYear(),
+          return util.offsetUTC(new Date(Date.UTC(d.getUTCFullYear(),
             d.getUTCMonth(),
-            d.getUTCDate() + 1));
+            d.getUTCDate() + 1)));
         };
 
         // When the date updates while dragging the pick backward
         tl.zoom.current.pick.prevChange = function (d) {
-          return new Date(Date.UTC(d.getUTCFullYear(),
+          return util.offsetUTC(new Date(Date.UTC(d.getUTCFullYear(),
             d.getUTCMonth(),
-            d.getUTCDate()));
+            d.getUTCDate())));
         };
 
         tl.zoom.current.pick.hoverTick = function (newDate) {
@@ -529,11 +529,11 @@ export function timelineConfig(models, config, ui) {
         tickCountMax = Math.ceil(tl.width / tickWidth);
 
         paddedRange = [
-          new Date(tl.data.start().setUTCMinutes(tl.data.start().getUTCMinutes() - 50)),
-          new Date(tl.data.end().setUTCMinutes(tl.data.end().getUTCMinutes() + 50))
+          util.offsetUTC(new Date(tl.data.start().setUTCMinutes(tl.data.start().getUTCMinutes() - 50))),
+          util.offsetUTC(new Date(tl.data.end().setUTCMinutes(tl.data.end().getUTCMinutes() + 50)))
         ];
 
-        altEnd = new Date(tl.data.start()
+        altEnd = util.offsetUTC(new Date(tl.data.start()
           .getUTCFullYear(),
         tl.data.start()
           .getUTCMonth(),
@@ -542,7 +542,7 @@ export function timelineConfig(models, config, ui) {
         tl.data.start()
           .getUTCHours(),
         tl.data.start()
-          .getUTCMinutes() + tickCountMax);
+          .getUTCMinutes() + tickCountMax));
 
         tl.zoom.drawTicks(tickCount,
           tickCountMax,
@@ -572,14 +572,14 @@ export function timelineConfig(models, config, ui) {
 
         // Calculated next boundary tick by date
         tl.zoom.current.ticks.boundary.next = function (current) {
-          var next = new Date(current);
-          return new Date(next.setUTCHours(next.getUTCHours() + 3));
+          var next = util.offsetUTC(new Date(current));
+          return util.offsetUTC(new Date(next.setUTCHours(next.getUTCHours() + 3)));
         };
 
         // Calculated next normal tick by date
         tl.zoom.current.ticks.normal.next = function (current) {
-          var next = new Date(current);
-          return new Date(next.setUTCMinutes(next.getUTCMinutes() + 10));
+          var next = util.offsetUTC(new Date(current));
+          return util.offsetUTC(new Date(next.setUTCMinutes(next.getUTCMinutes() + 10)));
         };
 
         // Date of first printed boundary interval of this zoom level
@@ -587,21 +587,21 @@ export function timelineConfig(models, config, ui) {
           var first = tl.ticks.normal.firstDate;
           var threeHour = null;
           if (first.getUTCHours() % 3 === 0) { threeHour = first.getUTCHours(); }
-          return new Date(Date.UTC(first.getUTCFullYear(),
+          return util.offsetUTC(new Date(Date.UTC(first.getUTCFullYear(),
             first.getUTCMonth(),
             first.getUTCDate(),
             threeHour,
-            0));
+            0)));
         };
 
         // Date of first printed normal tick
         tl.zoom.current.ticks.normal.first = function () {
           var first = tl.ticks.normal.firstDate;
-          return new Date(Date.UTC(first.getUTCFullYear(),
+          return util.offsetUTC(new Date(Date.UTC(first.getUTCFullYear(),
             first.getUTCMonth(),
             first.getUTCDate(),
             first.getUTCHours(),
-            first.getUTCMinutes() - 10));
+            first.getUTCMinutes() - 10)));
         };
 
         // Date of last printed boundary interval of this zoom level
@@ -609,11 +609,11 @@ export function timelineConfig(models, config, ui) {
           var last = tl.ticks.normal.lastDate;
           var threeHour = null;
           if (last.getUTCHours() % 3 === 0) { threeHour = last.getUTCHours(); }
-          return new Date(Date.UTC(last.getUTCFullYear(),
+          return util.offsetUTC(new Date(Date.UTC(last.getUTCFullYear(),
             last.getUTCMonth(),
             last.getUTCDate(),
             threeHour,
-            0));
+            0)));
         };
 
         // Value for normal tick hover label
@@ -624,22 +624,20 @@ export function timelineConfig(models, config, ui) {
 
         // Value for clicked normal tick
         tl.zoom.current.ticks.normal.clickDate = function (d) {
-          d = new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
-          return new Date(d.getUTCFullYear(),
+          return util.offsetUTC(new Date(d.getUTCFullYear(),
             d.getUTCMonth(),
             d.getUTCDate(),
             d.getUTCHours(),
-            d.getUTCMinutes());
+            d.getUTCMinutes()));
         };
 
         // Value for boundary ribbon hover label
         tl.zoom.current.ticks.boundary.hover = function (d) {
-          d = new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
-          return new Date(d.getUTCFullYear(),
+          return util.offsetUTC(new Date(d.getUTCFullYear(),
             d.getUTCMonth(),
             d.getUTCDate(),
             d.getUTCHours(),
-            d.getUTCMinutes());
+            d.getUTCMinutes()));
         };
 
         // Displayed default label
@@ -654,32 +652,31 @@ export function timelineConfig(models, config, ui) {
 
         // Value for clicked boundary tick
         tl.zoom.current.ticks.boundary.clickDate = function (d) {
-          d = new Date(d.getTime() - (d.getTimezoneOffset() * 60000));
-          return new Date(d.getUTCFullYear(),
+          return util.offsetUTC(new Date(d.getUTCFullYear(),
             d.getUTCMonth(),
             d.getUTCDate(),
             d.getUTCHours(),
-            model.selected.getUTCMinutes());
+            model.selected.getUTCMinutes()));
         };
 
         // When the date updates while dragging the pick forward
         tl.zoom.current.pick.nextChange = function (d) {
           d = util.roundTimeTenMinute(d);
-          return new Date(Date.UTC(d.getUTCFullYear(),
+          return util.offsetUTC(new Date(Date.UTC(d.getUTCFullYear(),
             d.getUTCMonth(),
             d.getUTCDate(),
             d.getUTCHours(),
-            d.getUTCMinutes() + 10));
+            d.getUTCMinutes() + 10)));
         };
 
         // When the date updates while dragging the pick backward
         tl.zoom.current.pick.prevChange = function (d) {
           d = util.roundTimeTenMinute(d);
-          return new Date(Date.UTC(d.getUTCFullYear(),
+          return util.offsetUTC(new Date(Date.UTC(d.getUTCFullYear(),
             d.getUTCMonth(),
             d.getUTCDate(),
             d.getUTCHours(),
-            d.getUTCMinutes()));
+            d.getUTCMinutes())));
         };
 
         tl.zoom.current.pick.hoverTick = function (newDate) {

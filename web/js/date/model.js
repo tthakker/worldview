@@ -74,9 +74,7 @@ export function dateModel(config, spec) {
   self.maxZoom = null;
 
   self.save = function (state) {
-    state.t = self.selected.toISOString()
-      .split('T')[0] + '-' + 'T' + self.selected.toISOString()
-        .split('T')[1].slice(0, -5) + 'Z';
+    state.t = util.toISOStringSeconds(self.selected);
     if (self.selectedZoom) {
       state.z = self.selectedZoom.toString();
     }

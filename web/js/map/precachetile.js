@@ -1,6 +1,7 @@
 import lodashEach from 'lodash/each';
 import olExtent from 'ol/extent';
 import OlRendererCanvasTileLayer from 'ol/renderer/canvas/tilelayer';
+import util from '../util/util';
 
 export function mapPrecacheTile(models, config, cache, parent) {
   /**
@@ -61,7 +62,7 @@ export function mapPrecacheTile(models, config, cache, parent) {
     var arra = [];
     layers = models.layers.get();
     lodashEach(layers, function (layer) {
-      if (layer.visible && new Date(layer.startDate > date)) {
+      if (layer.visible && util.offsetUTC(new Date(layer.startDate > date))) {
         arra.push(layer);
       }
     });

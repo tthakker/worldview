@@ -16,6 +16,7 @@ import Cache from 'cachai';
 import closestTo from 'date-fns/closest_to';
 import isBefore from 'date-fns/is_before';
 import isEqual from 'date-fns/is_equal';
+import format from 'date-fns/format';
 
 export default (function (self) {
   var canvas = null;
@@ -196,13 +197,19 @@ export default (function (self) {
       millisecond = hhmmss[3] || 0;
     }
 
-    var date = new Date(Date.UTC(year, month, day, hour, minute, second,
-      millisecond));
+    var date = self.offsetUTC(new Date(Date.UTC(year, month, day, hour, minute, second,
+      millisecond)));
     if (isNaN(date.getTime())) {
       throw new Error('Invalid date: ' + dateAsString);
     }
     return date;
   };
+
+  self.offsetUTC = function(date) {
+    date = self.toISOStringSeconds(date).slice(0, -1) + '+00:00';
+    return new Date(date);
+  };
+
   /**
    * Uses canvas.measureText to compute and return the width of the given text of given font in pixels.
    *
@@ -274,7 +281,7 @@ export default (function (self) {
   };
 
   self.roundTimeOneMinute = function (time) {
-    var timeToReturn = new Date(time);
+    var timeToReturn = self.offsetUTC(new Date(time));
 
     timeToReturn.setMilliseconds(Math.round(timeToReturn.getMilliseconds() / 1000) * 1000);
     timeToReturn.setSeconds(Math.round(timeToReturn.getSeconds() / 60) * 60);
@@ -283,7 +290,7 @@ export default (function (self) {
   };
 
   self.roundTimeTenMinute = function (time) {
-    var timeToReturn = new Date(time);
+    var timeToReturn = self.offsetUTC(new Date(time));
 
     timeToReturn.setMilliseconds(Math.round(timeToReturn.getMilliseconds() / 1000) * 1000);
     timeToReturn.setSeconds(Math.round(timeToReturn.getSeconds() / 60) * 60);
@@ -310,7 +317,7 @@ export default (function (self) {
 
   self.dateAdd = function (date, interval, amount) {
     var month, maxDay, year;
-    var newDate = new Date(date.getTime());
+    var newDate = self.offsetUTC(new Date(date.getTime()));
     switch (interval) {
       case 'minute':
         newDate.setUTCMinutes(newDate.getUTCMinutes() + amount);
@@ -324,7 +331,7 @@ export default (function (self) {
       case 'month':
         year = newDate.getUTCFullYear();
         month = newDate.getUTCMonth();
-        maxDay = new Date(year, month + amount + 1, 0)
+        maxDay = self.offsetUTC(new Date(year, month + amount + 1, 0))
           .getUTCDate();
         if (maxDay <= date.getUTCDate()) {
           newDate.setUTCDate(maxDay);
@@ -350,13 +357,13 @@ export default (function (self) {
       year = d.year;
       month = d.month;
     }
-    var lastDay = new Date(Date.UTC(year, month + 1, 0));
+    var lastDay = self.offsetUTC(new Date(Date.UTC(year, month + 1, 0)));
     return lastDay.getUTCDate();
   };
 
   self.daysInYear = function (time) {
-    var start = new Date(time.getUTCFullYear(), 0, 0);
-    var diff = (time - start) + ((start.getTimezoneOffset() - time.getTimezoneOffset()) * 60 * 1000);
+    var start = self.offsetUTC(new Date(time.getUTCFullYear(), 0, 0));
+    var diff = time - start;
     var oneDay = 1000 * 60 * 60 * 24;
     var day = Math.floor(diff / oneDay);
     return day;
@@ -436,11 +443,11 @@ export default (function (self) {
   };
 
   self.minDate = function () {
-    return new Date(Date.UTC(1000, 0, 1, 0, 0));
+    return self.offsetUTC(new Date(Date.UTC(1000, 0, 1, 0, 0)));
   };
 
   self.maxDate = function () {
-    return new Date(Date.UTC(3000, 11, 30, 23, 59));
+    return self.offsetUTC(new Date(Date.UTC(3000, 11, 30, 23, 59)));
   };
 
   self.rollRange = function (date, interval, minDate, maxDate) {
@@ -449,43 +456,43 @@ export default (function (self) {
     var first, last;
     switch (interval) {
       case 'minute':
-        var firstMinute = new Date(Date.UTC(year, month, 1, 0, 0));
-        var lastMinute = new Date(Date.UTC(year, month, self.daysInMonth(date), 23, 59));
-        first = new Date(Math.max(firstMinute, minDate))
+        var firstMinute = self.offsetUTC(new Date(Date.UTC(year, month, 1, 0, 0)));
+        var lastMinute = self.offsetUTC(new Date(Date.UTC(year, month, self.daysInMonth(date), 23, 59)));
+        first = self.offsetUTC(new Date(Math.max(firstMinute, minDate)))
           .getUTCMinutes();
-        last = new Date(Math.min(lastMinute, maxDate))
+        last = self.offsetUTC(new Date(Math.min(lastMinute, maxDate)))
           .getUTCMinutes();
         break;
       case 'hour':
-        var firstHour = new Date(Date.UTC(year, month, 1, 0));
-        var lastHour = new Date(Date.UTC(year, month, self.daysInMonth(date), 23));
-        first = new Date(Math.max(firstHour, minDate))
+        var firstHour = self.offsetUTC(new Date(Date.UTC(year, month, 1, 0)));
+        var lastHour = self.offsetUTC(new Date(Date.UTC(year, month, self.daysInMonth(date), 23)));
+        first = self.offsetUTC(new Date(Math.max(firstHour, minDate)))
           .getUTCHours();
-        last = new Date(Math.min(lastHour, maxDate))
+        last = self.offsetUTC(new Date(Math.min(lastHour, maxDate)))
           .getUTCHours();
         break;
       case 'day':
-        var firstDay = new Date(Date.UTC(year, month, 1));
-        var lastDay = new Date(Date.UTC(year, month, self.daysInMonth(date)));
-        first = new Date(Math.max(firstDay, minDate))
+        var firstDay = self.offsetUTC(new Date(Date.UTC(year, month, 1)));
+        var lastDay = self.offsetUTC(new Date(Date.UTC(year, month, self.daysInMonth(date))));
+        first = self.offsetUTC(new Date(Math.max(firstDay, minDate)))
           .getUTCDate();
-        last = new Date(Math.min(lastDay, maxDate))
+        last = self.offsetUTC(new Date(Math.min(lastDay, maxDate)))
           .getUTCDate();
         break;
       case 'month':
-        var firstMonth = new Date(Date.UTC(year, 0, 1));
-        var lastMonth = new Date(Date.UTC(year, 11, 31));
-        first = new Date(Math.max(firstMonth, minDate))
+        var firstMonth = self.offsetUTC(new Date(Date.UTC(year, 0, 1)));
+        var lastMonth = self.offsetUTC(new Date(Date.UTC(year, 11, 31)));
+        first = self.offsetUTC(new Date(Math.max(firstMonth, minDate)))
           .getUTCMonth();
-        last = new Date(Math.min(lastMonth, maxDate))
+        last = self.offsetUTC(new Date(Math.min(lastMonth, maxDate)))
           .getUTCMonth();
         break;
       case 'year':
         var firstYear = self.minDate();
         var lastYear = self.maxDate();
-        first = new Date(Math.max(firstYear, minDate))
+        first = self.offsetUTC(new Date(Math.max(firstYear, minDate)))
           .getUTCFullYear();
-        last = new Date(Math.min(lastYear, maxDate))
+        last = self.offsetUTC(new Date(Math.min(lastYear, maxDate)))
           .getUTCFullYear();
         break;
     }
@@ -533,8 +540,8 @@ export default (function (self) {
     if (day > daysInMonth) {
       day = daysInMonth;
     }
-    var newDate = new Date(Date.UTC(year, month, day, hour, minute));
-    newDate = new Date(self.clamp(newDate, minDate, maxDate));
+    var newDate = self.offsetUTC(new Date(Date.UTC(year, month, day, hour, minute)));
+    newDate = self.offsetUTC(new Date(self.clamp(newDate, minDate, maxDate)));
     return newDate;
   };
 
@@ -566,14 +573,14 @@ export default (function (self) {
     if (lodashIsNull(v)) {
       throw new Error('Invalid timestamp:' + str);
     }
-    return new Date(Date.UTC(
+    return self.offsetUTC(new Date(Date.UTC(
       parseInt(v[1], 10),
       parseInt(v[2] - 1, 10),
       parseInt(v[3], 10),
       parseInt(v[4], 10),
       parseInt(v[5], 10),
       parseInt(v[6], 10),
-      parseInt(v[7], 10)));
+      parseInt(v[7], 10))));
   };
 
   /**
@@ -585,7 +592,7 @@ export default (function (self) {
    * @return {Date} The current time or an overriden value.
    */
   var now = function () {
-    return new Date();
+    return self.offsetUTC(new Date());
   };
   self.now = now;
   self.resetNow = function () {
@@ -901,8 +908,8 @@ export default (function (self) {
   };
 
   self.dayDiff = function (startDate, endDate) {
-    var date1 = new Date(startDate);
-    var date2 = new Date(endDate);
+    var date1 = self.offsetUTC(new Date(startDate));
+    var date2 = self.offsetUTC(new Date(endDate));
     var timeDiff = Math.abs(date2.getTime() - date1.getTime());
     var dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
     return dayDiff;
@@ -920,7 +927,6 @@ export default (function (self) {
    */
   self.datesinDateRanges = function (def, date, containRange) {
     var dateArray = [];
-    var currentDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
 
     lodashEach(def.dateRanges, function (dateRange) {
       var yearDifference;
@@ -930,54 +936,51 @@ export default (function (self) {
       var maxMonthDate;
       var maxDayDate;
       let dateInterval = dateRange.dateInterval;
-      let minDate = new Date(dateRange.startDate);
-      let maxDate = new Date(dateRange.endDate);
+      let minDate = self.offsetUTC(new Date(dateRange.startDate));
+      let maxDate = self.offsetUTC(new Date(dateRange.endDate));
 
-      // Offset timezone
-      minDate = new Date(minDate.getTime() + (minDate.getTimezoneOffset() * 60000));
-      maxDate = new Date(maxDate.getTime() + (maxDate.getTimezoneOffset() * 60000));
-      maxYearDate = new Date(maxDate.getUTCFullYear() + 1, maxDate.getUTCMonth(), maxDate.getUTCDate());
-      maxMonthDate = new Date(maxDate.getUTCFullYear(), maxDate.getUTCMonth() + 1, maxDate.getUTCDate());
-      maxDayDate = new Date(maxDate.getUTCFullYear(), maxDate.getUTCMonth(), maxDate.getUTCDate() + 1);
+      maxYearDate = self.offsetUTC(new Date(maxDate.getUTCFullYear() + 1, maxDate.getUTCMonth(), maxDate.getUTCDate()));
+      maxMonthDate = self.offsetUTC(new Date(maxDate.getUTCFullYear(), maxDate.getUTCMonth() + 1, maxDate.getUTCDate()));
+      maxDayDate = self.offsetUTC(new Date(maxDate.getUTCFullYear(), maxDate.getUTCMonth(), maxDate.getUTCDate() + 1));
 
       if (def.period === 'yearly') {
         // if containgeRange is true, check if date is between current dateRange.startDate && dateRange.endDate
         if (!containRange) {
           yearDifference = self.yearDiff(minDate, maxYearDate);
-        } else if (currentDate >= minDate && currentDate <= maxYearDate) {
+        } else if (date >= minDate && date <= maxYearDate) {
           // Find the yearDifference of the endDate vs startDate
           yearDifference = self.yearDiff(minDate, maxYearDate);
         }
 
         // Create array of all possible request dates by saying for interval++ <= yearDifference
         for (dateInterval = 0; dateInterval <= (yearDifference + 1); dateInterval++) {
-          dateArray.push(new Date(minDate.getUTCFullYear() + dateInterval, minDate.getUTCMonth(), minDate.getUTCDate(), 0, 0, 0));
+          dateArray.push(self.offsetUTC(new Date(minDate.getUTCFullYear() + dateInterval, minDate.getUTCMonth(), minDate.getUTCDate(), 0, 0, 0)));
         }
       } else if (def.period === 'monthly') {
         // if containgeRange is true, check if date is between current dateRange.startDate && dateRange.endDate
         if (!containRange) {
           monthDifference = self.monthDiff(minDate, maxMonthDate);
-        } else if (currentDate >= minDate && currentDate <= maxMonthDate) {
+        } else if (date >= minDate && date <= maxMonthDate) {
           // Find the monthDifference of the endDate vs startDate
           monthDifference = self.monthDiff(minDate, maxMonthDate);
         }
 
         // Create array of all possible request dates by saying for interval++ <= monthDifference
         for (dateInterval = 0; dateInterval <= (monthDifference + 1); dateInterval++) {
-          dateArray.push(new Date(minDate.getUTCFullYear(), minDate.getUTCMonth() + dateInterval, minDate.getUTCDate(), 0, 0, 0));
+          dateArray.push(self.offsetUTC(new Date(minDate.getUTCFullYear(), minDate.getUTCMonth() + dateInterval, minDate.getUTCDate(), 0, 0, 0)));
         }
       } else if (def.period === 'daily') {
         // if containgeRange is true, check if date is between current dateRange.startDate && dateRange.endDate
         if (!containRange) {
           dayDifference = self.dayDiff(minDate, maxDayDate);
-        } else if (currentDate >= minDate && currentDate <= maxDayDate) {
+        } else if (date >= minDate && date <= maxDayDate) {
           // Find the dayDifference of the endDate vs startDate
           dayDifference = self.dayDiff(minDate, maxDayDate);
         }
 
         // Create array of all possible request dates by saying for interval++ <= dayDifference
         for (dateInterval = 0; dateInterval <= (dayDifference + 1); dateInterval++) {
-          dateArray.push(new Date(minDate.getUTCFullYear(), minDate.getUTCMonth(), minDate.getUTCDate() + dateInterval, 0, 0, 0));
+          dateArray.push(self.offsetUTC(new Date(minDate.getUTCFullYear(), minDate.getUTCMonth(), minDate.getUTCDate() + dateInterval, 0, 0, 0)));
         }
       }
     });
@@ -992,19 +995,18 @@ export default (function (self) {
    * @return {object}           The date object with normalized timeszone.
    */
   self.prevDateInDateRange = function (date, dateArray) {
-    var currentDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
     if (!dateArray) return date;
 
     // Return an array of the closest available dates within the range
     var closestAvailableDates = [];
     lodashEach(dateArray, function(rangeDate) {
-      if (isBefore(rangeDate, currentDate) || isEqual(rangeDate, currentDate)) {
+      if (isBefore(rangeDate, date) || isEqual(rangeDate, date)) {
         closestAvailableDates.push(rangeDate);
       }
     });
 
     // Find the closest dates within the current array
-    var closestDate = closestTo(currentDate, closestAvailableDates);
+    var closestDate = closestTo(date, closestAvailableDates);
 
     if (closestDate) {
       return closestDate;

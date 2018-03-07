@@ -24,8 +24,8 @@ export function timelineInput(models, config, ui) {
 
   var forwardNextMinute = function () { // FIXME: Limit animation correctly
     self.delta = 10;
-    var nextMinute = new Date(new Date(model.selected)
-      .setUTCMinutes(model.selected.getUTCMinutes() + 10));
+    var nextMinute = util.offsetUTC(new Date(util.offsetUTC(new Date(model.selected))
+      .setUTCMinutes(model.selected.getUTCMinutes() + 10)));
     if (nextMinute <= util.now()) {
       animateForward('minute', 10);
     } else {
@@ -35,8 +35,8 @@ export function timelineInput(models, config, ui) {
 
   var forwardNextDay = function () { // FIXME: Limit animation correctly
     self.delta = 1;
-    var nextDay = new Date(new Date(model.selected)
-      .setUTCDate(model.selected.getUTCDate() + 1));
+    var nextDay = util.offsetUTC(new Date(util.offsetUTC(new Date(model.selected))
+      .setUTCDate(model.selected.getUTCDate() + 1)));
     if (nextDay <= util.today()) {
       animateForward('day', 1);
     } else {
@@ -46,8 +46,8 @@ export function timelineInput(models, config, ui) {
 
   var forwardNextMonth = function () {
     self.delta = 1;
-    var nextMonth = new Date(new Date(model.selected)
-      .setUTCMonth(model.selected.getUTCMonth() + 1));
+    var nextMonth = util.offsetUTC(new Date(util.offsetUTC(new Date(model.selected))
+      .setUTCMonth(model.selected.getUTCMonth() + 1)));
     if (nextMonth <= util.today()) {
       animateForward('month', 1);
     } else {
@@ -57,8 +57,8 @@ export function timelineInput(models, config, ui) {
 
   var forwardNextYear = function () {
     self.delta = 1;
-    var nextYear = new Date(new Date(model.selected)
-      .setUTCFullYear(model.selected.getUTCFullYear() + 1));
+    var nextYear = util.offsetUTC(new Date(util.offsetUTC(new Date(model.selected))
+      .setUTCFullYear(model.selected.getUTCFullYear() + 1)));
     if (nextYear <= util.today()) {
       animateForward('year', 1);
     } else {
@@ -116,8 +116,8 @@ export function timelineInput(models, config, ui) {
 
   var reversePrevMinute = function () {
     self.delta = 10;
-    var prevMinute = new Date(new Date(model.selected)
-      .setUTCMinutes(model.selected.getUTCMinutes() - 10));
+    var prevMinute = util.offsetUTC(new Date(util.offsetUTC(new Date(model.selected))
+      .setUTCMinutes(model.selected.getUTCMinutes() - 10)));
     if (prevMinute >= tl.data.start()) {
       animateReverse('minute', -10);
     } else {
@@ -127,8 +127,8 @@ export function timelineInput(models, config, ui) {
 
   var reversePrevDay = function () { // FIXME: Limit animation correctly
     self.delta = 1;
-    var prevDay = new Date(new Date(model.selected)
-      .setUTCDate(model.selected.getUTCDate() - 1));
+    var prevDay = util.offsetUTC(new Date(util.offsetUTC(new Date(model.selected))
+      .setUTCDate(model.selected.getUTCDate() - 1)));
     if (prevDay >= tl.data.start()) {
       animateReverse('day', -1);
     } else {
@@ -138,8 +138,8 @@ export function timelineInput(models, config, ui) {
 
   var reversePrevMonth = function () {
     self.delta = 1;
-    var prevMonth = new Date(new Date(model.selected)
-      .setUTCMonth(model.selected.getUTCMonth() - 1));
+    var prevMonth = util.offsetUTC(new Date(util.offsetUTC(new Date(model.selected))
+      .setUTCMonth(model.selected.getUTCMonth() - 1)));
     if (prevMonth >= tl.data.start()) {
       animateReverse('month', -1);
     } else {
@@ -149,8 +149,8 @@ export function timelineInput(models, config, ui) {
 
   var reversePrevYear = function () {
     self.delta = 1;
-    var prevYear = new Date(new Date(model.selected)
-      .setUTCFullYear(model.selected.getUTCFullYear() - 1));
+    var prevYear = util.offsetUTC(new Date(util.offsetUTC(new Date(model.selected))
+      .setUTCFullYear(model.selected.getUTCFullYear() - 1)));
     if (prevYear >= tl.data.start()) {
       animateReverse('year', -1);
     } else {
@@ -225,17 +225,17 @@ export function timelineInput(models, config, ui) {
       switch (YMDInterval) {
         case 'year-input-group':
           if ((newInput > 1000) && (newInput < 9999)) {
-            selectedDateObj = new Date(
-              (new Date(model.selected))
-                .setUTCFullYear(newInput));
+            selectedDateObj = util.offsetUTC(new Date(
+              (util.offsetUTC(new Date(model.selected)))
+                .setUTCFullYear(newInput)));
           }
           break;
         case 'month-input-group':
           if (($.isNumeric(newInput)) &&
             (newInput < 13) && (newInput > 0)) {
-            selectedDateObj = new Date(
-              (new Date(model.selected))
-                .setUTCMonth(newInput - 1));
+            selectedDateObj = util.offsetUTC(new Date(
+              (util.offsetUTC(new Date(model.selected)))
+                .setUTCMonth(newInput - 1)));
           } else {
             var validStr = false;
             var newIntInput;
@@ -248,35 +248,35 @@ export function timelineInput(models, config, ui) {
               }
             }
             if (validStr) {
-              selectedDateObj = new Date(
-                (new Date(model.selected))
-                  .setUTCMonth(newIntInput));
+              selectedDateObj = util.offsetUTC(new Date(
+                (util.offsetUTC(new Date(model.selected)))
+                  .setUTCMonth(newIntInput)));
             }
           }
           break;
         case 'day-input-group':
           if (newInput > 0 &&
-            newInput <= (new Date(model.selected.getYear(),
-              model.selected.getMonth() + 1, 0)
+            newInput <= (util.offsetUTC(new Date(model.selected.getYear(),
+              model.selected.getMonth() + 1, 0))
               .getDate())) {
-            selectedDateObj = new Date(
-              (new Date(model.selected))
-                .setUTCDate(newInput));
+            selectedDateObj = util.offsetUTC(new Date(
+              (util.offsetUTC(new Date(model.selected)))
+                .setUTCDate(newInput)));
           }
           break;
         case 'hour-input-group':
           if ((newInput >= 0) && (newInput <= 23)) {
-            selectedDateObj = new Date(
-              (new Date(model.selected))
-                .setUTCHours(newInput));
+            selectedDateObj = util.offsetUTC(new Date(
+              (util.offsetUTC(new Date(model.selected)))
+                .setUTCHours(newInput)));
           }
           break;
         case 'minute-input-group':
           if ((newInput >= 0) && (newInput <= 59)) {
             var coeff = 1000 * 60 * 10;
-            selectedDateObj = new Date(Math.round(
-              (new Date(model.selected))
-                .setUTCMinutes(newInput) / coeff) * coeff);
+            selectedDateObj = util.offsetUTC(new Date(Math.round(
+              (util.offsetUTC(new Date(model.selected)))
+                .setUTCMinutes(newInput) / coeff) * coeff));
           }
           break;
       }
@@ -352,9 +352,9 @@ export function timelineInput(models, config, ui) {
 
   // TODO: Cleanup
   self.update = function (date) {
-    var ms = date || new Date(model.selected);
-    var nd = new Date(ms.setUTCDate(ms.getUTCDate() + 1));
-    var pd = new Date(ms.setUTCDate(ms.getUTCDate() - 1));
+    var ms = date || util.offsetUTC(new Date(model.selected));
+    var nd = util.offsetUTC(new Date(ms.setUTCDate(ms.getUTCDate() + 1)));
+    var pd = util.offsetUTC(new Date(ms.setUTCDate(ms.getUTCDate() - 1)));
 
     // Update fields
     $('#year-input-group')
