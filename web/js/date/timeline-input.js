@@ -22,54 +22,30 @@ export function timelineInput(models, config, ui) {
   var $incrementBtn = $('#right-arrow-group');
   var $decrementBtn = $('#left-arrow-group');
 
-  var forwardNextMinute = function () { // FIXME: Limit animation correctly
-    self.delta = 10;
-    var nextMinute = new Date(new Date(model.selected)
-      .setUTCMinutes(model.selected.getUTCMinutes() + 10));
-    if (nextMinute <= util.now()) {
-      animateForward('minute', 10);
+  var changeByIncrement = function(delta, increment) {
+    self.delta = Math.abs(delta);
+    var nextTime = getNextTimeSelection(delta, increment);
+    if (tl.data.start() <= nextTime <= util.now()) {
+      (delta > 0) ? animateForward(increment, delta) : animateReverse(increment, delta);
     } else {
       self.stop();
     }
   };
-
-  var forwardNextDay = function () { // FIXME: Limit animation correctly
-    self.delta = 1;
-    var nextDay = new Date(new Date(model.selected)
-      .setUTCDate(model.selected.getUTCDate() + 1));
-    if (nextDay <= util.today()) {
-      animateForward('day', 1);
-    } else {
-      self.stop();
+  var getNextTimeSelection = function(delta, increment) {
+    switch (increment) {
+      case 'year':
+        return new Date(new Date(model.selected).setUTCFullYear(model.selected.getUTCFullYear() + increment));
+      case 'month':
+        return new Date(new Date(model.selected).setUTCMonth(model.selected.getUTCMonth() + increment));
+      case 'day':
+        return new Date(new Date(model.selected).setUTCDate(model.selected.getUTCDate() + increment));
+      case 'minute':
+        return new Date(new Date(model.selected).setUTCMinutes(model.selected.getUTCMinutes() + increment));
     }
   };
-
-  var forwardNextMonth = function () {
-    self.delta = 1;
-    var nextMonth = new Date(new Date(model.selected)
-      .setUTCMonth(model.selected.getUTCMonth() + 1));
-    if (nextMonth <= util.today()) {
-      animateForward('month', 1);
-    } else {
-      self.stop();
-    }
-  };
-
-  var forwardNextYear = function () {
-    self.delta = 1;
-    var nextYear = new Date(new Date(model.selected)
-      .setUTCFullYear(model.selected.getUTCFullYear() + 1));
-    if (nextYear <= util.today()) {
-      animateForward('year', 1);
-    } else {
-      self.stop();
-    }
-  };
-
   self.forward = function () {
     self.play('forward');
   };
-
   self.reverse = function () {
     self.play('reverse');
   };
@@ -81,7 +57,6 @@ export function timelineInput(models, config, ui) {
     timer = null;
     self.active = false;
   };
-
   var prepareFrame = function () {
     if (!self.active) {
       return;
@@ -112,50 +87,6 @@ export function timelineInput(models, config, ui) {
     self.direction = direction || self.direction;
     self.active = true;
     prepareFrame();
-  };
-
-  var reversePrevMinute = function () {
-    self.delta = 10;
-    var prevMinute = new Date(new Date(model.selected)
-      .setUTCMinutes(model.selected.getUTCMinutes() - 10));
-    if (prevMinute >= tl.data.start()) {
-      animateReverse('minute', -10);
-    } else {
-      self.stop();
-    }
-  };
-
-  var reversePrevDay = function () { // FIXME: Limit animation correctly
-    self.delta = 1;
-    var prevDay = new Date(new Date(model.selected)
-      .setUTCDate(model.selected.getUTCDate() - 1));
-    if (prevDay >= tl.data.start()) {
-      animateReverse('day', -1);
-    } else {
-      self.stop();
-    }
-  };
-
-  var reversePrevMonth = function () {
-    self.delta = 1;
-    var prevMonth = new Date(new Date(model.selected)
-      .setUTCMonth(model.selected.getUTCMonth() - 1));
-    if (prevMonth >= tl.data.start()) {
-      animateReverse('month', -1);
-    } else {
-      self.stop();
-    }
-  };
-
-  var reversePrevYear = function () {
-    self.delta = 1;
-    var prevYear = new Date(new Date(model.selected)
-      .setUTCFullYear(model.selected.getUTCFullYear() - 1));
-    if (prevYear >= tl.data.start()) {
-      animateReverse('year', -1);
-    } else {
-      self.stop();
-    }
   };
 
   var animateForward = function (interval, amount) {
@@ -406,19 +337,19 @@ export function timelineInput(models, config, ui) {
         e.preventDefault();
         switch (ui.timeline.config.currentZoom) {
           case 1:
-            forwardNextYear();
+            changeByIncrement(1, 'year');
             break;
           case 2:
-            forwardNextMonth();
+            changeByIncrement(1, 'month');
             break;
           case 3:
-            forwardNextDay();
+            changeByIncrement(1, 'day');
             break;
           case 4:
-            forwardNextMinute();
+            changeByIncrement(10, 'minute');
             break;
           default:
-            forwardNextDay();
+            changeByIncrement(1, 'day');
         }
       })
       .mouseup(self.stop);
@@ -428,19 +359,19 @@ export function timelineInput(models, config, ui) {
         e.preventDefault();
         switch (ui.timeline.config.currentZoom) {
           case 1:
-            reversePrevYear();
+            changeByIncrement(-1, 'year');
             break;
           case 2:
-            reversePrevMonth();
+            changeByIncrement(-1, 'month');
             break;
           case 3:
-            reversePrevDay();
+            changeByIncrement(-1, 'day');
             break;
           case 4:
-            reversePrevMinute();
+            changeByIncrement(-10, 'minute');
             break;
           default:
-            reversePrevDay();
+            changeByIncrement(-1, 'day');
         }
       })
       .mouseup(self.stop);
