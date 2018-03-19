@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import util from '../util/util';
 import lodashParseInt from 'lodash/parseInt';
+import lodashDebounce from 'lodash/debounce';
 
 /**
  * Implements the date input
@@ -10,26 +11,33 @@ import lodashParseInt from 'lodash/parseInt';
 export function timelineInput(models, config, ui) {
   var tl = ui.timeline;
   var model = models.date;
-  var timer;
   var self = {};
   var rollingDate;
   self.direction = 'forward';
   self.interval = 'day';
   self.delta = 1;
   self.active = false;
-  self.delay = 500;
+  self.delay = 1000;
+  var animator = null;
+  var keyDown;
 
   var $incrementBtn = $('#right-arrow-group');
   var $decrementBtn = $('#left-arrow-group');
 
-  var changeByIncrement = function(delta, increment) {
+  var animateByIncrement = function(delta, increment) {
     self.delta = Math.abs(delta);
-    var nextTime = getNextTimeSelection(delta, increment);
-    if (tl.data.start() <= nextTime <= util.now()) {
-      (delta > 0) ? animateForward(increment, delta) : animateReverse(increment, delta);
-    } else {
-      self.stop();
+    function animate() {
+      var nextTime = getNextTimeSelection(delta, increment);
+      if (tl.data.start() <= nextTime <= util.now()) {
+        models.date.add(increment, delta);
+      };
+      animator = setTimeout(animate, self.delay);
     }
+    animate();
+  };
+  var stopper = function() {
+    clearInterval(animator);
+    animator = 0;
   };
   var getNextTimeSelection = function(delta, increment) {
     switch (increment) {
@@ -43,75 +51,8 @@ export function timelineInput(models, config, ui) {
         return new Date(new Date(model.selected).setUTCMinutes(model.selected.getUTCMinutes() + increment));
     }
   };
-  self.forward = function () {
-    self.play('forward');
-  };
-  self.reverse = function () {
-    self.play('reverse');
-  };
-
-  self.stop = function () {
-    if (timer) {
-      clearTimeout(timer);
-    }
-    timer = null;
-    self.active = false;
-  };
-  var prepareFrame = function () {
-    if (!self.active) {
-      return;
-    }
-    var amount = (self.direction === 'forward')
-      ? self.delta : -self.delta;
-    var newDate = util.dateAdd(model.selected, self.interval, amount);
-    timer = setTimeout(function () {
-      advance(newDate);
-    }, self.delay);
-  };
-
-  var advance = function (newDate) {
-    var updated = model.select(newDate);
-    if (!updated) {
-      self.stop();
-    } else {
-      prepareFrame();
-    }
-  };
-
-  self.play = function (direction) {
-    if (self.active && direction !== self.direction) {
-      self.stop();
-    } else if (self.active) {
-      return;
-    }
-    self.direction = direction || self.direction;
-    self.active = true;
-    prepareFrame();
-  };
-
-  var animateForward = function (interval, amount) {
-    if (self.active) {
-      return;
-    }
-    models.date.add(interval, amount);
-    self.interval = interval;
-    self.play('forward');
-  };
-
-  var animateReverse = function (interval, amount) {
-    if (self.active) {
-      return;
-    }
-    models.date.add(interval, amount);
-    self.interval = interval;
-    self.play('reverse');
-  };
 
   var roll = function (dataInterval, amt) {
-    if (timer) {
-      clearTimeout(timer);
-      timer = null;
-    }
     var interval = $(this)
       .attr('data-interval') || dataInterval;
     var amount = lodashParseInt($(this)
@@ -120,25 +61,23 @@ export function timelineInput(models, config, ui) {
     var min = models.date.minDate();
     var max = models.date.maxDate();
     var newDate = util.rollDate(date, interval, amount, min, max);
-
     if (newDate !== date) {
       rollingDate = newDate;
       $(this)
         .parent()
         .css('border-color', '');
       updateDateInputs(rollingDate);
-      var that = this;
-      timer = setTimeout(function () {
-        model.select(rollingDate);
-        $(that)
-          .parent()
-          .find('input')
-          .select();
-        rollingDate = null;
-        timer = null;
-      }, 400);
+      debounceDateChange(rollingDate);
+      $(this)
+        .parent()
+        .find('input')
+        .select();
     }
   };
+  var selectNewDate = function(newDate) {
+    model.select(newDate);
+  };
+  var debounceDateChange = lodashDebounce(selectNewDate, self.delay);
 
   // TODO: Cleanup
   var validateInput = function (event) {
@@ -337,78 +276,78 @@ export function timelineInput(models, config, ui) {
         e.preventDefault();
         switch (ui.timeline.config.currentZoom) {
           case 1:
-            changeByIncrement(1, 'year');
+            animateByIncrement(1, 'year');
             break;
           case 2:
-            changeByIncrement(1, 'month');
+            animateByIncrement(1, 'month');
             break;
           case 3:
-            changeByIncrement(1, 'day');
+            animateByIncrement(1, 'day');
             break;
           case 4:
-            changeByIncrement(10, 'minute');
+            animateByIncrement(10, 'minute');
             break;
           default:
-            changeByIncrement(1, 'day');
+            animateByIncrement(1, 'day');
         }
       })
-      .mouseup(self.stop);
+      .mouseup(stopper);
 
     $decrementBtn
       .mousedown(function (e) {
         e.preventDefault();
         switch (ui.timeline.config.currentZoom) {
           case 1:
-            changeByIncrement(-1, 'year');
+            animateByIncrement(-1, 'year');
             break;
           case 2:
-            changeByIncrement(-1, 'month');
+            animateByIncrement(-1, 'month');
             break;
           case 3:
-            changeByIncrement(-1, 'day');
+            animateByIncrement(-1, 'day');
             break;
           case 4:
-            changeByIncrement(-10, 'minute');
+            animateByIncrement(-10, 'minute');
             break;
           default:
-            changeByIncrement(-1, 'day');
+            animateByIncrement(-1, 'day');
         }
       })
-      .mouseup(self.stop);
+      .mouseup(stopper);
 
     $(document)
-      .mouseout(self.stop)
+      .mouseout(stopper)
       .keydown(function (event) {
-        if (event.target.nodeName === 'INPUT') {
-          return;
-        }
+        if (event.target.nodeName === 'INPUT' || keyDown === event.keyCode) return;
         switch (event.keyCode) {
           case util.key.LEFT:
             if (models.date.selectedZoom === 4) {
-              animateReverse('hour', -1);
+              animateByIncrement(-1, 'hour');
             } else {
-              animateReverse('day', -1);
+              animateByIncrement(-1, 'day');
             }
             event.preventDefault();
             break;
           case util.key.RIGHT:
             if (models.date.selectedZoom === 4) {
-              animateReverse('hour', 1);
+              animateByIncrement(1, 'hour');
             } else {
-              animateReverse('day', 1);
+              animateByIncrement(1, 'day');
             }
             event.preventDefault();
             break;
         }
+        keyDown = event.keyCode;
       })
       .keyup(function (event) {
         switch (event.keyCode) {
           case util.key.LEFT:
           case util.key.RIGHT:
-            self.stop();
+            stopper();
             event.preventDefault();
             break;
         }
+        keyDown = null;
       });
     // bind click action to interval radio buttons
     var $buttons = $('.button-input-group');
