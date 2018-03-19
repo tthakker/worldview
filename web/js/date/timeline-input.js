@@ -67,15 +67,15 @@ export function timelineInput(models, config, ui) {
         .parent()
         .css('border-color', '');
       updateDateInputs(rollingDate);
-      debounceDateChange(rollingDate);
-      $(this)
-        .parent()
-        .find('input')
-        .select();
+      debounceDateChange(rollingDate, this);
     }
   };
-  var selectNewDate = function(newDate) {
+  var selectNewDate = function(newDate, el) {
     model.select(newDate);
+    $(el)
+      .parent()
+      .find('input')
+      .select();
   };
   var debounceDateChange = lodashDebounce(selectNewDate, self.delay);
 
