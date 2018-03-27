@@ -141,7 +141,8 @@
     "react": "^15.6.2",
     "react-dom": "^15.6.2",
     "worldview-components": "^1.6.2",
-    "worldview-options-eosdis": "github:nasa-gibs/worldview-options-eosdis#v2.8.0"
+    "worldview-options-eosdis": "github:nasa-gibs/worldview-options-eosdis#v2.8.0",
+    "supercluster": "github:mapbox/supercluster#v3.0.2"
   },
   "browser": {
     "d3": "./web/ext/d3/d3.js",
