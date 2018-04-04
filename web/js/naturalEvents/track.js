@@ -177,13 +177,13 @@ var naturalEventsTrackStyle = function() {
     'white-line': new OlStyleStyle({
       stroke: new OlStyleStroke({
         color: 'white',
-        width: 1
+        width: 3
       })
     }),
     'black-line': new OlStyleStyle({
       stroke: new OlStyleStroke({
         color: 'black',
-        width: 2
+        width: 1
       })
     })
   };
@@ -225,8 +225,8 @@ var createTrack = function (eventObj, map, selectedDate, callback) {
   eventTrackStyles = naturalEventsTrackStyle();
   pointObject = addPoints(clusters, map, selectedDate, callback);
 
-  olTrackLineFeatures.push(naturalEventsTrackLine(pointObject.trackArray, 'black-line'));
   olTrackLineFeatures.push(naturalEventsTrackLine(pointObject.trackArray, 'white-line'));
+  olTrackLineFeatures.push(naturalEventsTrackLine(pointObject.trackArray, 'black-line'));
 
   return {
     'id': eventObj.id,
